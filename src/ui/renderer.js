@@ -164,6 +164,58 @@ function drawPreview(context, type, width, height) {
     }
 }
 
+function createMultiplayerCard(index) {
+    const card = document.createElement("article");
+    card.className = "multiplayer-card";
+
+    const header = document.createElement("header");
+    header.className = "multiplayer-card__header";
+    const title = document.createElement("h3");
+    title.className = "multiplayer-card__title";
+    const status = document.createElement("span");
+    status.className = "multiplayer-card__status";
+    header.append(title, status);
+
+    const boardFrame = document.createElement("div");
+    boardFrame.className = "multiplayer-card__board-frame";
+    const canvas = document.createElement("canvas");
+    canvas.className = "multiplayer-card__canvas";
+    canvas.width = 200;
+    canvas.height = 400;
+    canvas.setAttribute("aria-label", `Plateau du joueur ${index + 1}`);
+    const gameOver = document.createElement("div");
+    gameOver.className = "multiplayer-card__game-over";
+    gameOver.textContent = "Partie terminée";
+    gameOver.hidden = true;
+    boardFrame.append(canvas, gameOver);
+
+    const statistics = document.createElement("dl");
+    statistics.className = "multiplayer-card__statistics";
+    const score = createStatistic(statistics, "Score");
+    const level = createStatistic(statistics, "Niveau");
+    const lines = createStatistic(statistics, "Lignes");
+    card.append(header, boardFrame, statistics);
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+        throw new Error("Le navigateur ne permet pas le rendu HTML5 Canvas.");
+    }
+
+    return { card, title, status, canvas, context, gameOver, score, level, lines };
+}
+
+function createStatistic(container, label) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "multiplayer-card__stat";
+    const term = document.createElement("dt");
+    term.textContent = label;
+    const value = document.createElement("dd");
+    value.textContent = "0";
+    wrapper.append(term, value);
+    container.append(wrapper);
+    return value;
+}
+
 /** Crée un rendu Canvas qui affiche l'état reçu sans le modifier. */
 export function createRenderer({
     boardCanvas,
@@ -204,4 +256,83 @@ export function createRenderer({
             gameOverElement.textContent = "Partie terminée";
         }
     };
+}
+
+/** Prépare l'affichage d'une à quatre parties dans une grille de joueurs. */
+export function createMultiplayerRenderer({ container }) {
+    requireElement(container, "container");
+    const grid = container.querySelector(".multiplayer-grid");
+    if (!grid) {
+        throw new Error("Le conteneur doit inclure un élément .multiplayer-grid.");
+    }
+
+    const soloLayout = container.closest(".arcade")?.querySelector(".game-layout");
+    const cards = new Map();
+    function renderPlayers(players) {
+        if (!Array.isArray(players) || players.length < 1 || players.length > 4) {
+            throw new RangeError("L'affichage doit contenir entre 1 et 4 joueurs.");
+        }
+        if (players.filter(player => player?.role === "human").length !== 1) {
+            throw new TypeError("L'affichage doit contenir exactement un joueur humain.");
+        }
+
+        container.hidden = false;
+        if (soloLayout) {
+            soloLayout.hidden = true;
+        }
+        grid.dataset.playerCount = String(players.length);
+        const activeCards = [];
+        players.forEach((player, index) => {
+            if (!player?.game || !["human", "opponent"].includes(player.role)) {
+                throw new TypeError("Chaque joueur doit avoir un rôle et une partie valides.");
+            }
+
+            let view = cards.get(index);
+            if (!view) {
+                view = createMultiplayerCard(index);
+                cards.set(index, view);
+            }
+
+            const label = player.role === "human"
+                ? "Joueur humain"
+                : `Adversaire ${players.slice(0, index + 1).filter(item => item.role === "opponent").length}`;
+            view.title.textContent = label;
+            view.card.classList.toggle("multiplayer-card--human", player.role === "human");
+            view.card.classList.toggle("multiplayer-card--opponent", player.role === "opponent");
+            view.canvas.setAttribute("aria-label", `Plateau : ${label}`);
+
+            const game = player.game;
+            drawBoard(view.context, game, view.canvas.width, view.canvas.height);
+            view.score.textContent = game.score.toLocaleString("fr-FR");
+            view.level.textContent = String(game.level);
+            view.lines.textContent = String(game.linesCleared);
+            view.status.textContent = game.status === "gameover" ? "Terminée" : "En cours";
+            view.status.classList.toggle("multiplayer-card__status--ended", game.status === "gameover");
+            view.gameOver.hidden = game.status !== "gameover";
+            activeCards.push(view.card);
+        });
+
+        for (const [index, view] of cards) {
+            if (index >= players.length) {
+                cards.delete(index);
+            }
+        }
+        activeCards.forEach((card, index) => {
+            if (grid.children[index] !== card) {
+                grid.insertBefore(card, grid.children[index] ?? null);
+            }
+        });
+        while (grid.children.length > activeCards.length) {
+            grid.lastElementChild.remove();
+        }
+    }
+
+    function showSolo() {
+        container.hidden = true;
+        if (soloLayout) {
+            soloLayout.hidden = false;
+        }
+    }
+
+    return { renderPlayers, showSolo };
 }

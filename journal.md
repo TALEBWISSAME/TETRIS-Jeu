@@ -171,3 +171,14 @@ Le gestionnaire permet de créer une partie solo ou avec 1 à 3 adversaires. Cha
 Copilot a ajouté 13 tests pour vérifier les différentes configurations, l'indépendance des parties et la reproductibilité.
 
 Résultat : 71 tests réussis sur 71. Aucun fichier existant n'a été modifié et aucune IA n'a été ajoutée.
+### Exercice 4 — Étape 3 : Interface multijoueur
+
+J'ai utilisé Copilot Agent pour préparer l'affichage de plusieurs parties de Tetris.
+
+Copilot a modifié `renderer.js`, `index.html` et `styles.css`. Il a ajouté une fonction pour afficher de 1 à 4 grilles, avec une disposition 2 × 2 et un style arcade néon.
+
+Chaque partie peut afficher son score, son niveau et son état. Le joueur humain est distingué des adversaires.
+
+Le mode multijoueur n'est pas encore connecté à `main.js`. Cette partie sera réalisée à l'étape suivante.
+
+Résultat : 71 tests réussis sur 71. Le moteur du jeu n'a pas été modifié.

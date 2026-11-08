@@ -32,6 +32,10 @@ button {
     font: inherit;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 .page-glow {
     position: fixed;
     z-index: -1;
@@ -369,6 +373,143 @@ button {
     color: var(--cyan);
 }
 
+.multiplayer-section {
+    margin: 0 auto;
+    animation: rise-in 500ms ease-out both;
+}
+
+.multiplayer-section > .panel-heading {
+    margin: 0 0 16px;
+    color: #d3dcff;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.multiplayer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(14px, 2.4vw, 26px);
+}
+
+.multiplayer-card {
+    --player-accent: var(--violet);
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid color-mix(in srgb, var(--player-accent) 48%, transparent);
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(17, 23, 45, 0.94), rgba(9, 13, 27, 0.96));
+    box-shadow:
+        0 0 18px color-mix(in srgb, var(--player-accent) 12%, transparent),
+        inset 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.multiplayer-card--human {
+    --player-accent: var(--cyan);
+}
+
+.multiplayer-card--opponent {
+    --player-accent: var(--pink);
+}
+
+.multiplayer-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.multiplayer-card__title {
+    overflow: hidden;
+    margin: 0;
+    color: var(--player-accent);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: clamp(0.7rem, 1.6vw, 0.88rem);
+    letter-spacing: 0.08em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px color-mix(in srgb, var(--player-accent) 55%, transparent);
+}
+
+.multiplayer-card__status {
+    flex: 0 0 auto;
+    padding: 4px 7px;
+    border: 1px solid color-mix(in srgb, var(--cyan) 35%, transparent);
+    border-radius: 999px;
+    color: var(--cyan);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.multiplayer-card__status--ended {
+    border-color: color-mix(in srgb, var(--pink) 42%, transparent);
+    color: #ff8cde;
+}
+
+.multiplayer-card__board-frame {
+    position: relative;
+    overflow: hidden;
+    width: min(100%, 220px);
+    margin: 0 auto;
+    border: 1px solid color-mix(in srgb, var(--player-accent) 55%, transparent);
+    border-radius: 5px;
+    background: #080d1b;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--player-accent) 20%, transparent);
+}
+
+.multiplayer-card__canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 2;
+}
+
+.multiplayer-card__game-over {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(6, 8, 20, 0.8);
+    color: #ff8cde;
+    font-family: "Segoe UI", sans-serif;
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    font-weight: 700;
+    text-align: center;
+    text-shadow: 0 0 16px rgba(255, 89, 199, 0.8);
+}
+
+.multiplayer-card__statistics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 11px 0 0;
+}
+
+.multiplayer-card__stat {
+    min-width: 0;
+    text-align: center;
+}
+
+.multiplayer-card__stat dt {
+    color: var(--muted);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.multiplayer-card__stat dd {
+    overflow: hidden;
+    margin: 4px 0 0;
+    color: #e8edff;
+    font-family: "Segoe UI", sans-serif;
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+}
+
 @keyframes rise-in {
     from {
         opacity: 0;
@@ -508,6 +649,24 @@ button {
         flex-wrap: wrap;
         margin-top: 20px;
         font-size: 0.52rem;
+    }
+
+    .multiplayer-grid {
+        gap: 9px;
+    }
+
+    .multiplayer-card {
+        padding: 9px;
+    }
+
+    .multiplayer-card__header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .multiplayer-card__status {
+        font-size: 0.5rem;
     }
 }
 
