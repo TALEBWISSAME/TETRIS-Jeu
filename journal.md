@@ -149,3 +149,15 @@ J'ai installé `@vitest/coverage-v8` et ajouté la commande `npm run coverage`. 
 Enfin, j'ai volontairement modifié `scoring.js` pour donner 300 points au lieu de 500 lorsque trois lignes sont supprimées. Un test a échoué. J'ai demandé à Copilot Agent de corriger le code à partir de l'erreur du terminal. Il a remis la bonne valeur dans `scoring.js` sans modifier les tests.
 
 Après la correction, les 52 tests ont de nouveau réussi.
+
+### Exercice 4 — Étape 1 : GameInstance
+
+J'ai commencé par demander à Copilot en mode Ask de proposer un plan pour le mode multijoueur. Il a proposé cinq étapes, que j'ai validées.
+
+Ensuite, j'ai utilisé Copilot Agent pour créer `game-instance.js` et `game-instance.test.js`.
+
+Copilot a réutilisé le moteur existant pour représenter une partie indépendante, avec son propre état et son générateur aléatoire.
+
+Il a ajouté 6 tests pour vérifier l'indépendance des parties et la compatibilité avec le mode solo.
+
+Résultat : 58 tests réussis sur 58. Aucun autre fichier n'a été modifié.
