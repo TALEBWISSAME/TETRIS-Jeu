@@ -236,3 +236,13 @@ Copilot a ajouté `chooseIntermediatePlacement` dans `ai.js`. Cette fonction sim
 En cas d'égalité, l'IA garde le premier placement trouvé. Copilot a aussi ajusté un scénario de test pour mieux vérifier la pénalité des trous.
 
 Résultat : 91 tests réussis sur 91. Les données de la partie ne sont pas modifiées et aucun autre fichier n'a été changé.
+
+### Exercice 5 — Étape 4 : IA experte
+
+J'ai demandé à Copilot Agent de développer une IA experte qui évalue les placements avec une formule prenant en compte la hauteur cumulée, les lignes supprimées, les trous et l'irrégularité des colonnes.
+
+Copilot a ajouté la fonction `chooseExpertPlacement` dans `ai.js`. Elle peut aussi anticiper le prochain coup lorsque la prochaine pièce est connue.
+
+Pendant les tests, Copilot a trouvé une erreur dans la valeur attendue pour l'irrégularité d'une grille. Il a corrigé cette valeur et relancé les tests.
+
+Résultat : 99 tests réussis sur 99. Seuls `ai.js` et `ai.test.js` ont été modifiés.

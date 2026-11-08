@@ -12,9 +12,13 @@ const HOLE_PENALTY = 50;
 const HEIGHT_PENALTY = 1;
 const MAX_HEIGHT_PENALTY = 2;
 
-function evaluatePlacement(grid, placement) {
+function simulatePlacement(grid, placement) {
     const placedGrid = placePiece(grid, placement.matrix, placement.x, placement.y);
-    const { grid: settledGrid, clearedRows } = clearFullRows(placedGrid);
+    return clearFullRows(placedGrid);
+}
+
+function evaluatePlacement(grid, placement) {
+    const { grid: settledGrid, clearedRows } = simulatePlacement(grid, placement);
     let aggregateHeight = 0;
     let maximumHeight = 0;
     let holes = 0;
@@ -42,6 +46,43 @@ function evaluatePlacement(grid, placement) {
         - holes * HOLE_PENALTY
         - aggregateHeight * HEIGHT_PENALTY
         - maximumHeight * MAX_HEIGHT_PENALTY;
+}
+
+/** Calcule les caractéristiques du plateau et le score pondéré de l'IA Experte. */
+export function evaluateExpertFeatures(grid, linesCleared = 0) {
+    let aggregateHeight = 0;
+    let holes = 0;
+    const columnHeights = [];
+
+    for (let x = 0; x < GRID_WIDTH; x++) {
+        let firstOccupiedRow = GRID_HEIGHT;
+        for (let y = 0; y < GRID_HEIGHT; y++) {
+            if (grid[y][x] === 1) {
+                firstOccupiedRow = y;
+                break;
+            }
+        }
+
+        const height = GRID_HEIGHT - firstOccupiedRow;
+        columnHeights.push(height);
+        aggregateHeight += height;
+        for (let y = firstOccupiedRow + 1; y < GRID_HEIGHT; y++) {
+            if (grid[y][x] === 0) {
+                holes++;
+            }
+        }
+    }
+
+    let irregularity = 0;
+    for (let x = 1; x < columnHeights.length; x++) {
+        irregularity += Math.abs(columnHeights[x] - columnHeights[x - 1]);
+    }
+
+    const score = -0.51 * aggregateHeight
+        + 0.76 * linesCleared
+        - 0.36 * holes
+        - 0.18 * irregularity;
+    return { aggregateHeight, linesCleared, holes, irregularity, score };
 }
 
 /** Énumère les positions finales accessibles d'une pièce sans modifier la grille. */
@@ -106,6 +147,42 @@ export function chooseIntermediatePlacement(grid, piece) {
 
     for (const placement of placements) {
         const score = evaluatePlacement(grid, placement);
+        if (score > bestScore) {
+            bestPlacement = placement;
+            bestScore = score;
+        }
+    }
+
+    return bestPlacement;
+}
+
+/** Choisit le meilleur placement, avec une anticipation facultative d'un coup. */
+export function chooseExpertPlacement(grid, piece, nextPiece) {
+    const placements = findLegalPlacements(grid, piece);
+    let bestPlacement = null;
+    let bestScore = -Infinity;
+
+    for (const placement of placements) {
+        const { grid: nextGrid, clearedRows } = simulatePlacement(grid, placement);
+        const currentScore = evaluateExpertFeatures(nextGrid, clearedRows).score;
+        let score = currentScore;
+
+        if (nextPiece !== undefined && nextPiece !== null) {
+            const nextPlacements = findLegalPlacements(nextGrid, nextPiece);
+            let bestNextScore = -Infinity;
+            for (const nextPlacement of nextPlacements) {
+                const { grid: finalGrid, clearedRows: nextClearedRows } =
+                    simulatePlacement(nextGrid, nextPlacement);
+                bestNextScore = Math.max(
+                    bestNextScore,
+                    evaluateExpertFeatures(finalGrid, nextClearedRows).score,
+                );
+            }
+            if (bestNextScore > -Infinity) {
+                score += bestNextScore;
+            }
+        }
+
         if (score > bestScore) {
             bestPlacement = placement;
             bestScore = score;

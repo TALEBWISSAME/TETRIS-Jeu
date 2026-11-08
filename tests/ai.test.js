@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import {
     chooseBeginnerPlacement,
+    chooseExpertPlacement,
     chooseIntermediatePlacement,
+    evaluateExpertFeatures,
     findLegalPlacements,
 } from "../src/core/ai.js";
 import { canPlacePiece, createGrid, GRID_HEIGHT, GRID_WIDTH } from "../src/core/grid.js";
@@ -199,5 +201,103 @@ describe("IA Intermédiaire", () => {
         const blockedGrid = Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(1));
 
         expect(chooseIntermediatePlacement(blockedGrid, PIECES.T)).toBeNull();
+    });
+});
+
+describe("IA Experte", () => {
+    it("calcule correctement les quatre caractéristiques et leur score pondéré exact", () => {
+        const grid = createGrid();
+        grid[18][0] = 1;
+        grid[19][0] = 1;
+        grid[17][1] = 1;
+        grid[19][1] = 1;
+
+        const features = evaluateExpertFeatures(grid, 2);
+
+        expect(features).toMatchObject({
+            aggregateHeight: 5,
+            linesCleared: 2,
+            holes: 1,
+            irregularity: 4,
+        });
+        expect(features.score).toBeCloseTo(-2.11);
+    });
+
+    it("choisit un placement légal", () => {
+        const grid = createGrid();
+        const placement = chooseExpertPlacement(grid, PIECES.T);
+
+        expect(placement).not.toBeNull();
+        expect(canPlacePiece(grid, placement.matrix, placement.x, placement.y)).toBe(true);
+    });
+
+    it("préfère un placement qui supprime une ligne", () => {
+        const grid = createGrid();
+        grid[GRID_HEIGHT - 1] = Array(GRID_WIDTH).fill(1);
+        grid[GRID_HEIGHT - 1][4] = 0;
+
+        const placement = chooseExpertPlacement(grid, [[1]]);
+
+        expect(placement.x).toBe(4);
+    });
+
+    it("anticipe le placement de la prochaine pièce lorsqu'elle est connue", () => {
+        const grid = createGrid();
+        const bottomRows = [
+            [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+            [1, 0, 1, 0, 0, 0, 0, 1, 1, 0],
+            [0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        ];
+        bottomRows.forEach((row, index) => {
+            grid[GRID_HEIGHT - bottomRows.length + index] = row;
+        });
+
+        const immediate = chooseExpertPlacement(grid, PIECES.J);
+        const anticipated = chooseExpertPlacement(grid, PIECES.J, PIECES.O);
+
+        expect(immediate).toMatchObject({ rotation: 3, x: 3 });
+        expect(anticipated).toMatchObject({ rotation: 1, x: 5 });
+    });
+
+    it("ne suppose pas de prochaine pièce lorsqu'elle est inconnue", () => {
+        const grid = createGrid();
+        const withoutNextPiece = chooseExpertPlacement(grid, PIECES.L);
+        const explicitlyUnknown = chooseExpertPlacement(grid, PIECES.L, null);
+
+        expect(explicitlyUnknown).toEqual(withoutNextPiece);
+    });
+
+    it("résout les égalités de façon déterministe et reproduit sa décision", () => {
+        const first = chooseExpertPlacement(createGrid(), [[1]]);
+        const repeated = chooseExpertPlacement(createGrid(), [[1]]);
+
+        expect(first).toEqual(repeated);
+        expect(first.x).toBe(0);
+    });
+
+    it("ne modifie ni les grilles ni les pièces d'origine", () => {
+        const game = createGame({ seed: 975 });
+        const gridBefore = game.grid.map(row => [...row]);
+        const currentPieceBefore = game.currentPiece.matrix.map(row => [...row]);
+        const nextPieceBefore = PIECES.O.map(row => [...row]);
+
+        const placement = chooseExpertPlacement(
+            game.grid,
+            game.currentPiece.matrix,
+            nextPieceBefore,
+        );
+
+        expect(placement).not.toBeNull();
+        expect(game.grid).toEqual(gridBefore);
+        expect(game.currentPiece.matrix).toEqual(currentPieceBefore);
+        expect(nextPieceBefore).toEqual(PIECES.O);
+    });
+
+    it("retourne null lorsqu'aucun placement légal n'existe", () => {
+        const blockedGrid = Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(1));
+
+        expect(chooseExpertPlacement(blockedGrid, PIECES.T)).toBeNull();
     });
 });
