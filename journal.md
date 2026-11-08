@@ -370,3 +370,17 @@ Maintenant, les IA choisissent leur placement, puis leurs pièces descendent pro
 Copilot a aussi ajouté des tests pour vérifier les trois niveaux d'IA et la descente des pièces.
 
 Résultat : 116 tests réussis sur 116.
+
+### Exercice 6 — Étape 6 : Correction de la validation des pièces
+
+J'ai demandé à Copilot Agent de corriger le deuxième problème majeur trouvé pendant la revue de code.
+
+Le problème venait de `GameInstance.playPlacement()`, qui pouvait accepter une matrice différente de la pièce active.
+
+Copilot a d'abord reproduit le problème avec une pièce T remplacée par une matrice `[[1]]`.
+
+Il a ensuite ajouté une vérification pour comparer la matrice proposée aux rotations possibles de la pièce active.
+
+Deux tests ont été ajoutés pour vérifier qu'une matrice incorrecte est refusée et qu'une rotation autorisée fonctionne toujours.
+
+Résultat : 118 tests réussis sur 118. Le score, les collisions et les autres règles du moteur n'ont pas été modifiés.

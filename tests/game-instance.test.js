@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createGame, movePiece } from "../src/core/game.js";
 import { GameInstance } from "../src/core/game-instance.js";
+import { PIECES, rotate } from "../src/core/piece.js";
 
 describe("GameInstance", () => {
     it("crée des grilles et des pièces indépendantes", () => {
@@ -109,5 +110,39 @@ describe("GameInstance", () => {
         })).toThrow("Le placement doit être une position finale légale.");
         expect(instance.grid).toEqual(gridBefore);
         expect(instance.currentPiece).toEqual(pieceBefore);
+    });
+
+    it("refuse une forme qui ne correspond pas à la pièce active", () => {
+        const instance = new GameInstance({ seed: 22 });
+        instance.currentPiece.matrix = PIECES.T.map(row => [...row]);
+        const gridBefore = instance.grid.map(row => [...row]);
+        const matrixBefore = instance.currentPiece.matrix.map(row => [...row]);
+        const pieceBefore = instance.currentPiece;
+
+        expect(() => instance.playPlacement({
+            matrix: [[1]],
+            x: 0,
+            y: 19,
+        })).toThrow("Le placement doit être une position finale légale.");
+
+        expect(instance.grid).toEqual(gridBefore);
+        expect(instance.currentPiece).toBe(pieceBefore);
+        expect(instance.currentPiece.matrix).toEqual(matrixBefore);
+    });
+
+    it("accepte et verrouille une rotation légale de la pièce active", () => {
+        const instance = new GameInstance({ seed: 22 });
+        instance.currentPiece.matrix = PIECES.T.map(row => [...row]);
+        const previousPiece = instance.currentPiece;
+        const rotatedMatrix = rotate(instance.currentPiece.matrix);
+
+        expect(instance.playPlacement({
+            matrix: rotatedMatrix,
+            x: 0,
+            y: 17,
+        })).toBe(instance);
+
+        expect(instance.grid.flat().filter(cell => cell === 1)).toHaveLength(4);
+        expect(instance.currentPiece).not.toBe(previousPiece);
     });
 });

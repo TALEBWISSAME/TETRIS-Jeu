@@ -6,6 +6,30 @@ import {
     tick,
 } from "./game.js";
 import { canPlacePiece } from "./grid.js";
+import { rotate } from "./piece.js";
+
+function isSameMatrix(first, second) {
+    return Array.isArray(first)
+        && Array.isArray(second)
+        && first.length === second.length
+        && first.every((row, y) =>
+            Array.isArray(row)
+            && Array.isArray(second[y])
+            && row.length === second[y].length
+            && row.every((cell, x) => cell === second[y][x])
+        );
+}
+
+function isPieceRotation(matrix, pieceMatrix) {
+    let rotation = pieceMatrix;
+    for (let quarterTurns = 0; quarterTurns < 4; quarterTurns++) {
+        if (isSameMatrix(matrix, rotation)) {
+            return true;
+        }
+        rotation = rotate(rotation);
+    }
+    return false;
+}
 
 /**
  * Partie indépendante qui délègue ses règles au moteur de jeu.
@@ -116,6 +140,7 @@ export class GameInstance {
             || !Array.isArray(placement.matrix)
             || !Number.isInteger(placement.x)
             || !Number.isInteger(placement.y)
+            || !isPieceRotation(placement.matrix, this.state.currentPiece.matrix)
             || !canPlacePiece(this.state.grid, placement.matrix, placement.x, placement.y)
             || canPlacePiece(this.state.grid, placement.matrix, placement.x, placement.y + 1)
         ) {
