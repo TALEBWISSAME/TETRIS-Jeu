@@ -317,20 +317,6 @@ J'ai accepté cette proposition, car elle correspond au fonctionnement actuel du
 
 Résultat : le fichier README.md a été créé sans modifier le code JavaScript ni les tests.
 
-### Exercice 6 — Étape 2 : Création du README
-
-J'ai demandé à Copilot Agent de créer un fichier README.md pour présenter mon projet Tetris.
-
-Copilot a d'abord consulté les fichiers du projet pour vérifier les fonctionnalités et les commandes disponibles.
-
-Il a ensuite créé le README avec une présentation du jeu, les fonctionnalités, les technologies utilisées, les instructions d'installation, les commandes de lancement, les tests et les contrôles clavier.
-
-Comme le projet ne possède pas de script npm pour démarrer un serveur, Copilot a indiqué la commande Python utilisée pour lancer le jeu en local.
-
-J'ai accepté cette proposition, car elle correspond au fonctionnement actuel du projet.
-
-Résultat : le fichier README.md a été créé sans modifier le code JavaScript ni les tests.
-
 ### Exercice 6 — Étape 3 : Documentation de l'architecture
 
 J'ai demandé à Copilot Agent de créer un document pour expliquer l'architecture de mon projet Tetris.

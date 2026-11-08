@@ -73,8 +73,10 @@ son état et son générateur de pièces sont indépendants. Les adversaires
 utilisent la difficulté sélectionnée dans l'interface; le générateur
 pseudo-aléatoire de l'IA Débutante est propre à chaque adversaire.
 
-À chaque descente programmée pour un adversaire, `playOpponentTurn` appelle la
-fonction correspondant à sa difficulté :
+À chaque échéance, `scheduleTick` dans `main.js` appelle
+`advanceOpponentTurn` avec le joueur et l'état de son tour. Pour chaque nouvelle
+pièce, cette fonction choisit un placement avec la stratégie correspondant à sa
+difficulté :
 
 - **Débutant** choisit au hasard parmi les placements légaux.
 - **Intermédiaire** choisit un placement selon une heuristique qui favorise les
@@ -84,10 +86,14 @@ fonction correspondant à sa difficulté :
   prochaine pièce est présent dans l'état de la partie, il peut aussi tenir
   compte d'un placement pour cette pièce.
 
-L'IA fournit une position finale légale; elle ne modifie pas elle-même la
-grille. `GameInstance.playPlacement` vérifie la position et demande au moteur
-d'effectuer la descente qui verrouille la pièce. Le moteur reste ainsi
-responsable des collisions, des lignes, du score et de la fin de partie.
+L'IA fournit une position finale légale sans modifier la grille. Le contrôleur
+applique la rotation choisie et la position horizontale à la pièce active, puis
+appelle `GameInstance.tick()`. La pièce descend ainsi d'une case à chaque
+échéance, comme celle du joueur humain. Le contrôleur conserve le même placement
+pendant la descente et choisit à nouveau lorsque le moteur crée la pièce
+suivante. `GameInstance.tick()` délègue au moteur, qui vérifie les collisions et
+verrouille la pièce lorsqu'elle ne peut plus descendre; le moteur gère ensuite
+les lignes, le score, le niveau et la fin de partie.
 
 Chaque joueur possède sa propre minuterie. Mettre le jeu en pause, le reprendre
 ou terminer une partie agit sur les minuteries et états correspondants.
@@ -119,6 +125,7 @@ flowchart TD
     Instance["src/core/game-instance.js"]
     Manager["src/core/game-manager.js"]
     AI["src/core/ai.js"]
+    Opponent["src/core/opponent-turn.js"]
     Input["src/ui/input.js"]
     Renderer["src/ui/renderer.js"]
     Colors["src/ui/locked-colors.js"]
@@ -126,12 +133,16 @@ flowchart TD
     Main --> Manager
     Main --> Game
     Main --> AI
+    Main --> Opponent
     Main --> Input
     Main --> Renderer
     Main --> Colors
     Manager --> Instance
     Manager --> Game
     Instance --> Game
+    Opponent -->|choisit un placement| AI
+    Opponent -->|utilise les matrices| Piece
+    Opponent -->|appelle tick| Instance
     Game --> Grid
     Game --> Piece
     Game --> Scoring
@@ -150,12 +161,17 @@ flowchart TD
     Timer["La minuterie du joueur arrive à échéance"]
     Human{"Le joueur est-il humain ?"}
     HumanTick["main.js appelle tick"]
-    Choose["main.js appelle l'IA adaptée"]
-    Placement["L'IA retourne un placement légal"]
-    Play["GameInstance.playPlacement vérifie le placement"]
-    Engine["Le moteur descend ou verrouille la pièce"]
-    Rows["Le moteur supprime les lignes et met à jour score et niveau"]
-    Colors["main.js synchronise les couleurs verrouillées"]
+    Controller["main.js appelle advanceOpponentTurn"]
+    NewPiece{"Nouvelle pièce pour l'IA ?"}
+    Choose["advanceOpponentTurn choisit le placement selon la difficulté"]
+    Apply["Le contrôleur applique la rotation et la colonne"]
+    Keep["Le contrôleur conserve le placement déjà choisi"]
+    InstanceTick["GameInstance.tick fait avancer la pièce d'une case"]
+    Engine{"La pièce peut-elle descendre ?"}
+    Descend["game.js déplace la pièce vers le bas"]
+    Lock["game.js verrouille la pièce et le moteur traite lignes et score"]
+    GridChanged{"La grille a-t-elle changé ?"}
+    Colors["main.js synchronise les couleurs et prépare l'animation"]
     Render["main.js dessine le nouvel état"]
     Continue{"La partie est-elle encore en cours ?"}
     Schedule["Une nouvelle descente est programmée"]
@@ -163,13 +179,21 @@ flowchart TD
 
     Timer --> Human
     Human -->|Oui| HumanTick
-    Human -->|Non| Choose
-    Choose --> Placement
-    Placement --> Play
+    Human -->|Non| Controller
+    Controller --> NewPiece
+    NewPiece -->|Oui| Choose
+    Choose --> Apply
+    NewPiece -->|Non| Keep
+    Apply --> InstanceTick
+    Keep --> InstanceTick
     HumanTick --> Engine
-    Play --> Engine
-    Engine --> Rows
-    Rows --> Colors
+    InstanceTick --> Engine
+    Engine -->|Oui| Descend
+    Engine -->|Non| Lock
+    Descend --> GridChanged
+    Lock --> GridChanged
+    GridChanged -->|Oui| Colors
+    GridChanged -->|Non| Render
     Colors --> Render
     Render --> Continue
     Continue -->|Oui| Schedule
