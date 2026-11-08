@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
-import { findLegalPlacements } from "../src/core/ai.js";
+import { describe, expect, it, vi } from "vitest";
+import { chooseBeginnerPlacement, findLegalPlacements } from "../src/core/ai.js";
 import { canPlacePiece, createGrid, GRID_HEIGHT, GRID_WIDTH } from "../src/core/grid.js";
-import { createGame } from "../src/core/game.js";
+import { createGame, createSeededRandom } from "../src/core/game.js";
 import { PIECES } from "../src/core/piece.js";
 
 describe("énumération des placements légaux", () => {
@@ -62,5 +62,62 @@ describe("énumération des placements légaux", () => {
         const grid = Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(1));
 
         expect(findLegalPlacements(grid, PIECES.T)).toEqual([]);
+    });
+});
+
+describe("IA Débutant", () => {
+    it("choisit un placement légal", () => {
+        const grid = createGrid();
+        const piece = PIECES.T;
+        const placement = chooseBeginnerPlacement(grid, piece, () => 0.5);
+
+        expect(placement).not.toBeNull();
+        expect(canPlacePiece(grid, placement.matrix, placement.x, placement.y)).toBe(true);
+        expect(canPlacePiece(grid, placement.matrix, placement.x, placement.y + 1)).toBe(false);
+    });
+
+    it("reproduit son choix avec la même graine", () => {
+        const grid = createGrid();
+        const first = chooseBeginnerPlacement(grid, PIECES.L, createSeededRandom(321));
+        const repeated = chooseBeginnerPlacement(grid, PIECES.L, createSeededRandom(321));
+
+        expect(repeated).toEqual(first);
+    });
+
+    it("peut choisir des placements différents selon le tirage aléatoire", () => {
+        const grid = createGrid();
+        const first = chooseBeginnerPlacement(grid, PIECES.T, () => 0);
+        const last = chooseBeginnerPlacement(grid, PIECES.T, () => 0.999999);
+
+        expect(last).not.toEqual(first);
+    });
+
+    it("retourne null sans consommer le générateur lorsqu'aucun placement n'est possible", () => {
+        const blockedGrid = Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(1));
+        const random = vi.fn(() => 0.5);
+
+        expect(chooseBeginnerPlacement(blockedGrid, PIECES.T, random)).toBeNull();
+        expect(random).not.toHaveBeenCalled();
+    });
+
+    it("ne modifie ni la grille ni la pièce fournie", () => {
+        const game = createGame({ seed: 678 });
+        const gridBefore = game.grid.map(row => [...row]);
+        const pieceBefore = game.currentPiece.matrix.map(row => [...row]);
+
+        const placement = chooseBeginnerPlacement(
+            game.grid,
+            game.currentPiece.matrix,
+            createSeededRandom(9),
+        );
+
+        expect(placement).not.toBeNull();
+        expect(game.grid).toEqual(gridBefore);
+        expect(game.currentPiece.matrix).toEqual(pieceBefore);
+    });
+
+    it("refuse les générateurs absents ou les tirages hors de l'intervalle valide", () => {
+        expect(() => chooseBeginnerPlacement(createGrid(), PIECES.T, null)).toThrow(TypeError);
+        expect(() => chooseBeginnerPlacement(createGrid(), PIECES.T, () => 1)).toThrow(RangeError);
     });
 });

@@ -36,3 +36,21 @@ export function findLegalPlacements(grid, piece) {
 
     return placements;
 }
+
+/** Choisit un placement légal au hasard avec un générateur injectable. */
+export function chooseBeginnerPlacement(grid, piece, random = Math.random) {
+    if (typeof random !== "function") {
+        throw new TypeError("Le générateur aléatoire doit être une fonction.");
+    }
+
+    const placements = findLegalPlacements(grid, piece);
+    if (placements.length === 0) {
+        return null;
+    }
+
+    const value = random();
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value >= 1) {
+        throw new RangeError("Le générateur aléatoire doit retourner un nombre entre 0 inclus et 1 exclu.");
+    }
+    return placements[Math.floor(value * placements.length)];
+}

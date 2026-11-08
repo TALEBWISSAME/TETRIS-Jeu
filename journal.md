@@ -216,3 +216,13 @@ Copilot a ajouté une fonction `findLegalPlacements` qui cherche les placements 
 Lors de la première exécution, un test a échoué à cause d'une valeur `-0`. Copilot a corrigé ce problème et relancé les tests.
 
 Résultat : 77 tests réussis sur 77, dont 6 nouveaux tests. Aucun autre fichier n'a été modifié.
+
+### Exercice 5 — Étape 2 : IA débutante
+
+J'ai demandé à Copilot Agent de créer une IA débutante qui choisit un placement au hasard parmi les placements possibles.
+
+Copilot a ajouté la fonction `chooseBeginnerPlacement` dans `ai.js`. Elle utilise la fonction créée à l'étape précédente et un générateur aléatoire pour choisir un placement valide.
+
+Il a aussi ajouté 6 tests pour vérifier les placements, les tirages reproductibles, les cas où aucun placement n'est possible et l'absence de modification de la grille.
+
+Résultat : 83 tests réussis sur 83. Aucun autre fichier n'a été modifié.
