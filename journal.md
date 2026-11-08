@@ -79,3 +79,13 @@ Copilot a créé src/core/grid.js et tests/grid.test.js. Il a ajouté les foncti
 L'Agent a exécuté npm test : les 8 tests sont passés dans 2 fichiers.
 
 Nombre d'itérations : 1 demande, sans correction supplémentaire pour le moment.
+
+### Exercice 2 — Étape 2 : Score et niveaux
+
+J'ai utilisé le mode Agent de GitHub Copilot pour réaliser la deuxième étape du plan. Je lui ai demandé de créer les fonctions de calcul du score et du niveau ainsi que leurs tests.
+
+Copilot a créé src/core/scoring.js et tests/scoring.test.js. Le score dépend du nombre de lignes supprimées en une seule fois : 100, 300, 500 ou 800 points. Le niveau commence à 1 et augmente toutes les 10 lignes supprimées.
+
+J'ai vérifié le code et les cas de test proposés, notamment les valeurs invalides et les changements de niveau.
+
+Nombre d'itérations : 1 demande, sans correction supplémentaire.
