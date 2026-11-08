@@ -101,3 +101,19 @@ Lors du premier lancement des tests, trois problèmes ont été détectés dans 
 Au final, les 40 tests sont passés dans 4 fichiers. Aucun fichier existant n'a été modifié.
 
 Nombre d'itérations : plusieurs corrections et relances des tests ont été nécessaires.
+### Exercice 2 — Étape 4 : Interface graphique
+
+J'ai utilisé le mode Agent de GitHub Copilot pour créer l'interface graphique du Tetris. J'ai choisi un style arcade néon avec un fond sombre, des couleurs lumineuses et une interface responsive.
+
+Copilot a créé trois fichiers : src/ui/renderer.js, index.html et styles.css.
+
+Pendant le développement, Copilot a rencontré une erreur lors d'une modification du CSS. Il a relu le fichier et effectué une nouvelle modification.
+
+Les 40 tests existants sont passés. Les boutons et les commandes ne sont pas encore fonctionnels, car ils seront reliés au moteur à l'étape 5.
+
+J'ai également remarqué que les pièces verrouillées ont toutes la même couleur. Ce point devra être corrigé pour respecter la spécification.
+
+Nombre d'itérations : une correction du CSS après une erreur d'application.
+Après avoir vérifié les fichiers créés, j'ai demandé à Copilot d'ajouter des identifiants aux trois boutons pour faciliter leur utilisation à l'étape suivante. Copilot a modifié uniquement `index.html`, sans brancher les boutons.
+
+J'ai conservé cette modification. Les 40 tests annoncés précédemment étaient réussis. Je testerai l'interface complète lorsque le jeu sera fonctionnel.
