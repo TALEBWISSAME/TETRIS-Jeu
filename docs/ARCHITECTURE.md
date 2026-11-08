@@ -116,86 +116,127 @@ ensuite le rendu solo ou multijoueur.
 ## Relations entre les modules
 
 ```mermaid
-flowchart TD
-    Main["main.js"]
-    Game["src/core/game.js"]
-    Grid["src/core/grid.js"]
-    Piece["src/core/piece.js"]
-    Scoring["src/core/scoring.js"]
-    Instance["src/core/game-instance.js"]
-    Manager["src/core/game-manager.js"]
-    AI["src/core/ai.js"]
-    Opponent["src/core/opponent-turn.js"]
-    Input["src/ui/input.js"]
-    Renderer["src/ui/renderer.js"]
-    Colors["src/ui/locked-colors.js"]
+classDiagram
+    class GameManager {
+        +players
+        +humanPlayer
+        +opponents
+        +games
+    }
+    class GameInstance {
+        +state
+        +move(direction)
+        +rotate()
+        +tick()
+        +playPlacement(placement)
+    }
 
-    Main --> Manager
-    Main --> Game
-    Main --> AI
-    Main --> Opponent
-    Main --> Input
-    Main --> Renderer
-    Main --> Colors
-    Manager --> Instance
-    Manager --> Game
-    Instance --> Game
-    Opponent -->|choisit un placement| AI
-    Opponent -->|utilise les matrices| Piece
-    Opponent -->|appelle tick| Instance
-    Game --> Grid
-    Game --> Piece
-    Game --> Scoring
-    AI --> Grid
-    AI --> Piece
-    Renderer --> Grid
-    Renderer --> Piece
-    Colors --> Grid
-    Colors --> Piece
+    class MainModule {
+        <<module main.js>>
+    }
+    class GameModule {
+        <<module src/core/game.js>>
+    }
+    class GridModule {
+        <<module src/core/grid.js>>
+    }
+    class PieceModule {
+        <<module src/core/piece.js>>
+    }
+    class ScoringModule {
+        <<module src/core/scoring.js>>
+    }
+    class AIModule {
+        <<module src/core/ai.js>>
+    }
+    class OpponentTurnModule {
+        <<module src/core/opponent-turn.js>>
+    }
+    class InputModule {
+        <<module src/ui/input.js>>
+    }
+    class RendererModule {
+        <<module src/ui/renderer.js>>
+    }
+    class LockedColorsModule {
+        <<module src/ui/locked-colors.js>>
+    }
+
+    GameManager "1" *-- "1..4" GameInstance : crée et conserve
+
+    MainModule ..> GameManager : import direct
+    MainModule ..> GameModule : import direct
+    MainModule ..> GridModule : import direct
+    MainModule ..> OpponentTurnModule : import direct
+    MainModule ..> InputModule : import direct
+    MainModule ..> RendererModule : import direct
+    MainModule ..> LockedColorsModule : import direct
+
+    GameManager ..> GameInstance : import direct
+    GameManager ..> GameModule : import direct
+    GameInstance ..> GameModule : import direct
+    GameInstance ..> GridModule : import direct
+    GameInstance ..> PieceModule : import direct
+    GameModule ..> GridModule : import direct
+    GameModule ..> PieceModule : import direct
+    GameModule ..> ScoringModule : import direct
+    AIModule ..> GridModule : import direct
+    AIModule ..> PieceModule : import direct
+    OpponentTurnModule ..> AIModule : import direct
+    OpponentTurnModule ..> PieceModule : import direct
+    RendererModule ..> GridModule : import direct
+    RendererModule ..> PieceModule : import direct
+    LockedColorsModule ..> GridModule : import direct
+    LockedColorsModule ..> PieceModule : import direct
+
+    MainModule ..> AIModule : appel indirect via advanceOpponentTurn
+    OpponentTurnModule ..> GameInstance : appel player.game.tick()
 ```
 
 ## Étapes principales d'un tour
 
 ```mermaid
-flowchart TD
-    Timer["La minuterie du joueur arrive à échéance"]
-    Human{"Le joueur est-il humain ?"}
-    HumanTick["main.js appelle tick"]
-    Controller["main.js appelle advanceOpponentTurn"]
-    NewPiece{"Nouvelle pièce pour l'IA ?"}
-    Choose["advanceOpponentTurn choisit le placement selon la difficulté"]
-    Apply["Le contrôleur applique la rotation et la colonne"]
-    Keep["Le contrôleur conserve le placement déjà choisi"]
-    InstanceTick["GameInstance.tick fait avancer la pièce d'une case"]
-    Engine{"La pièce peut-elle descendre ?"}
-    Descend["game.js déplace la pièce vers le bas"]
-    Lock["game.js verrouille la pièce et le moteur traite lignes et score"]
-    GridChanged{"La grille a-t-elle changé ?"}
-    Colors["main.js synchronise les couleurs et prépare l'animation"]
-    Render["main.js dessine le nouvel état"]
-    Continue{"La partie est-elle encore en cours ?"}
-    Schedule["Une nouvelle descente est programmée"]
-    End["La partie s'arrête"]
+sequenceDiagram
+    participant Main as main.js
+    participant Turn as advanceOpponentTurn()
+    participant AI as src/core/ai.js
+    participant Instance as player.game (GameInstance)
+    participant Engine as src/core/game.js
+    participant Grid as src/core/grid.js
+    participant Colors as src/ui/locked-colors.js
+    participant Renderer as src/ui/renderer.js
 
-    Timer --> Human
-    Human -->|Oui| HumanTick
-    Human -->|Non| Controller
-    Controller --> NewPiece
-    NewPiece -->|Oui| Choose
-    Choose --> Apply
-    NewPiece -->|Non| Keep
-    Apply --> InstanceTick
-    Keep --> InstanceTick
-    HumanTick --> Engine
-    InstanceTick --> Engine
-    Engine -->|Oui| Descend
-    Engine -->|Non| Lock
-    Descend --> GridChanged
-    Lock --> GridChanged
-    GridChanged -->|Oui| Colors
-    GridChanged -->|Non| Render
-    Colors --> Render
-    Render --> Continue
-    Continue -->|Oui| Schedule
-    Continue -->|Non| End
+    Main->>Main: scheduleTick() attend dropIntervalMs
+    Main->>Main: perform() démarre le tick de l'adversaire
+    Main->>Turn: advanceOpponentTurn(player, opponentTurn)
+    alt Nouvelle pièce active
+        Turn->>AI: choose...Placement(grid, currentPiece.matrix, ...)
+        AI-->>Turn: placement légal
+        Turn->>Turn: applique matrix et x à la pièce active
+    else Placement déjà choisi pour cette pièce
+        Turn->>Turn: conserve matrix et x
+    end
+    Turn->>Instance: player.game.tick()
+    Instance->>Engine: tick(state)
+    Engine->>Grid: canPlacePiece(..., y + 1)
+    Grid-->>Engine: placement possible ou bloqué
+    alt La pièce peut descendre
+        Engine->>Engine: currentPiece.y += 1
+    else La pièce est bloquée
+        Engine->>Grid: placePiece() puis clearFullRows()
+        Grid-->>Engine: nouvelle grille et lignes supprimées
+        Engine->>Engine: met à jour score, niveau et pièce suivante
+    end
+    Engine-->>Instance: état de partie mis à jour
+    Instance-->>Turn: fin du tick
+    opt La pièce active vient d'être verrouillée
+        Turn->>Turn: efface le placement mémorisé
+    end
+    Turn-->>Main: état de partie
+    opt La grille a changé
+        Main->>Colors: applyLockedPiece(previousGrid, colors, piece, nextGrid)
+        Colors-->>Main: couleurs synchronisées
+    end
+    Main->>Renderer: renderPlayers() et affichage
+    Main->>Main: programme le prochain tick si la partie continue
 ```

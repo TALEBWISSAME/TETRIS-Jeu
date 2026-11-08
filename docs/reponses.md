@@ -147,29 +147,28 @@ Copilot a corrigé le commentaire pour expliquer ces comportements.
 
 Seule la documentation a été modifiée, sans changer le code du jeu ni les tests.
 
-### Question B — Le diagramme de classes montre-t-il une dépendance qui n'existe pas dans le code, ou en oublie-t-il une ? Vérifier avec les imports des fichiers.
+### Question B — Vérification des dépendances du diagramme
 
-Notre projet sépare la logique du jeu dans `src/core`, l'interface dans `src/ui` et le démarrage dans `main.js`.
+J'ai demandé à Copilot de comparer les diagrammes de `docs/ARCHITECTURE.md` avec les imports des fichiers JavaScript.
 
-Nous avons créé le document `docs/ARCHITECTURE.md` pour expliquer les relations entre ces modules.
+Il a trouvé des dépendances manquantes, notamment entre `main.js` et `grid.js`, ainsi qu'entre `game-instance.js` et `grid.js` et `piece.js`.
 
-Après la correction de la vitesse des IA, nous avons mis à jour ce document pour représenter le nouveau fonctionnement avec `advanceOpponentTurn` et `GameInstance.tick()`.
+Il a aussi trouvé un lien entre `main.js` et `ai.js` qui ne correspond pas à un import direct. En réalité, `main.js` utilise `opponent-turn.js`, qui importe les fonctions de l'IA.
 
-Les diagrammes ont été vérifiés au niveau de leur structure, mais nous n'avons pas encore comparé systématiquement toutes leurs dépendances avec les instructions `import` du code.
+Cette vérification m'a permis de voir que le diagramme ne représentait pas exactement toutes les dépendances du code.
 
-*Il reste à faire cette comparaison pour répondre précisément à la question.*
+J'ai également constaté que le document contenait deux flowcharts au lieu du diagramme de classes et du diagramme de séquence demandés.
 
-### Question C — Parmi les remarques de la revue, laquelle était fausse ? Comment l'avez-vous établi ?
+### Question C — Vérification des remarques de la revue de code
 
-Pendant la revue, Copilot a identifié deux problèmes majeurs :
+J'ai demandé à Copilot de vérifier les remarques de sa revue de code.
 
-1. Les adversaires IA jouaient beaucoup plus vite que le joueur humain.
-2. La méthode `playPlacement()` acceptait une matrice qui ne correspondait pas à la pièce active.
+Aucune des trois remarques ne s'est révélée fausse.
 
-Nous avons corrigé ces deux problèmes et ajouté des tests. Après les corrections, les 118 tests ont réussi.
+Le premier problème concernait les adversaires IA qui plaçaient leurs pièces directement. Le deuxième concernait la méthode `playPlacement()`, qui acceptait une matrice incorrecte.
 
-Copilot a aussi signalé un problème mineur concernant la position de l'animation des lignes supprimées.
+Ces deux problèmes ont été vérifiés avec des tests, puis corrigés.
 
-Nous n'avons pas démontré qu'une des remarques était fausse. Il serait donc incorrect d'en inventer une.
+Le troisième concernait l'animation des lignes supprimées. Le problème semble réel en lisant le code, mais nous ne l'avons pas vérifié visuellement.
 
-*Pour répondre complètement, il faut vérifier une remarque de la revue et montrer, avec le code ou un test, pourquoi elle est fausse.*
+Cette vérification m'a montré qu'il ne faut pas accepter automatiquement les remarques de Copilot : il faut les comparer au code et aux tests.
