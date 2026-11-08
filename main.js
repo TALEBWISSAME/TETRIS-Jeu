@@ -1,12 +1,7 @@
 import { movePiece, rotatePiece, softDrop, tick } from "./src/core/game.js";
 import { GRID_HEIGHT, GRID_WIDTH } from "./src/core/grid.js";
 import { GameManager } from "./src/core/game-manager.js";
-import {
-    chooseBeginnerPlacement,
-    chooseExpertPlacement,
-    chooseIntermediatePlacement,
-} from "./src/core/ai.js";
-import { PIECES } from "./src/core/piece.js";
+import { advanceOpponentTurn } from "./src/core/opponent-turn.js";
 import { bindInput } from "./src/ui/input.js";
 import { applyLockedPiece } from "./src/ui/locked-colors.js";
 import { createMultiplayerRenderer, createRenderer } from "./src/ui/renderer.js";
@@ -56,6 +51,7 @@ function makeRuntime(player, game, isHuman) {
         isPaused: false,
         timerId: null,
         lineClearAnimation: null,
+        opponentTurn: { piece: null, placement: null },
     };
 }
 
@@ -66,30 +62,6 @@ function createGameRuntimes() {
     return manager.players.map(player =>
         makeRuntime(player, player.game.state, player.role === "human")
     );
-}
-
-function playOpponentTurn(runtime) {
-    const { game, player } = runtime;
-    const { matrix } = game.currentPiece;
-    let placement;
-
-    if (player.difficulty === "beginner") {
-        placement = chooseBeginnerPlacement(game.grid, matrix, player.aiRandom);
-    } else if (player.difficulty === "intermediate") {
-        placement = chooseIntermediatePlacement(game.grid, matrix);
-    } else if (player.difficulty === "expert") {
-        const nextPiece = Object.hasOwn(PIECES, game.nextPieceType)
-            ? PIECES[game.nextPieceType]
-            : undefined;
-        placement = chooseExpertPlacement(game.grid, matrix, nextPiece);
-    } else {
-        throw new RangeError(`Difficulté d'adversaire inconnue : ${player.difficulty}.`);
-    }
-
-    if (!placement) {
-        throw new Error("L'IA n'a trouvé aucun placement légal pour une partie en cours.");
-    }
-    player.game.playPlacement(placement);
 }
 
 function drawRuntime(runtime) {
@@ -190,7 +162,7 @@ function scheduleTick(runtime) {
             if (runtime.player.role === "human") {
                 tick(item.game);
             } else {
-                playOpponentTurn(runtime);
+                advanceOpponentTurn(runtime.player, runtime.opponentTurn);
             }
         });
         scheduleTick(runtime);

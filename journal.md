@@ -344,3 +344,29 @@ Le document contient aussi deux diagrammes Mermaid : un pour montrer les relatio
 Copilot a vérifié la structure des diagrammes et les modifications Git.
 
 Résultat : le document d'architecture a été créé sans modifier le code du jeu.
+### Exercice 6 — Étape 4 : Revue du code
+
+J'ai utilisé Copilot en mode Ask pour analyser le code de mon Tetris sans le modifier.
+
+Copilot a vérifié le moteur, l'interface, les tests et la documentation.
+
+Il a identifié deux problèmes majeurs :
+- Les adversaires IA placent leurs pièces beaucoup plus vite que le joueur humain.
+- La méthode `playPlacement` ne vérifie pas suffisamment que la forme reçue correspond à la pièce active.
+
+Il a aussi signalé un problème mineur dans l'animation des lignes supprimées.
+
+J'ai décidé de traiter les deux problèmes majeurs en priorité, comme demandé dans le TP.
+### Exercice 6 — Étape 5 : Correction de la vitesse des IA
+
+Après la revue de code, j'ai demandé à Copilot Agent de corriger le premier problème majeur concernant la vitesse des adversaires.
+
+Avant la correction, les IA plaçaient immédiatement leurs pièces en bas de la grille, alors que le joueur humain devait attendre leur descente.
+
+Copilot a ajouté un contrôleur de tour IA dans `opponent-turn.js` et modifié `main.js`.
+
+Maintenant, les IA choisissent leur placement, puis leurs pièces descendent progressivement. Le moteur continue de gérer les collisions, le verrouillage et le score.
+
+Copilot a aussi ajouté des tests pour vérifier les trois niveaux d'IA et la descente des pièces.
+
+Résultat : 116 tests réussis sur 116.
