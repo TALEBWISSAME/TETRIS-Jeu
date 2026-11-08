@@ -63,3 +63,21 @@ Par exemple, j'ai d'abord vérifié la grille, puis le score, le moteur, l'inter
 Si j'avais demandé tout le jeu en une seule fois, il aurait été plus difficile de comprendre les erreurs et de savoir quelle partie corriger.
 
 Cette méthode m'a aussi permis de faire des tests et des commits régulièrement.
+
+## Exercice 3 — Tests et couverture
+
+### 1. Comment les tests ont-ils été réalisés ?
+
+J'ai d'abord utilisé Copilot Agent pour compléter les tests de la grille et du score. Ensuite, j'ai utilisé la complétion automatique de Copilot pour écrire moi-même trois tests : les quatre orientations de la pièce T, une collision contre un bord et une collision avec une pièce déjà posée.
+
+Copilot m'a proposé un test incorrect pour la collision contre le bord. J'ai dû corriger la taille de la grille et remplacer `toThrow()` par `toBe(false)`.
+
+### 2. Quel résultat ai-je obtenu pour les tests et la couverture ?
+
+J'ai obtenu 52 tests réussis sur 52. Avec `npm run coverage`, j'ai obtenu 93,79 % de couverture des lignes dans `src/core`, ce qui dépasse les 80 % demandés.
+
+### 3. Comment Copilot a-t-il corrigé le bug volontaire ?
+
+J'ai modifié `scoring.js` pour que trois lignes supprimées rapportent 300 points au lieu de 500. Après avoir lancé les tests, un test a échoué.
+
+J'ai transmis cette erreur à Copilot Agent. Il a retrouvé la mauvaise valeur et l'a corrigée dans `scoring.js`, sans modifier les tests. Après sa correction, les 52 tests ont réussi.
