@@ -125,11 +125,12 @@ export class GameInstance {
     }
 
     /**
-     * Applique une position finale légale et laisse le moteur verrouiller la pièce.
-     * Le moteur gère ensuite les lignes, le score, le niveau et la pièce suivante.
+     * Remplace l'orientation et la position de la pièce active par un placement légal,
+     * puis demande au moteur de la verrouiller. Le moteur gère ensuite les lignes,
+     * le score, le niveau et la pièce suivante. Si la partie est terminée, ne fait rien.
      * @param {{matrix: number[][], x: number, y: number}} placement Position finale à appliquer.
-     * @returns {GameInstance} Cette instance.
-     * @throws {Error} Si le placement ne correspond pas à une position finale légale.
+     * @returns {GameInstance} Cette instance, modifiée si la partie est en cours.
+     * @throws {Error} Si la partie est en cours et que le placement n'est pas une position finale légale.
      */
     playPlacement(placement) {
         if (this.state.status !== "playing") {

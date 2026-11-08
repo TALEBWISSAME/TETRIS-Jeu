@@ -81,3 +81,95 @@ J'ai obtenu 52 tests réussis sur 52. Avec `npm run coverage`, j'ai obtenu 93,79
 J'ai modifié `scoring.js` pour que trois lignes supprimées rapportent 300 points au lieu de 500. Après avoir lancé les tests, un test a échoué.
 
 J'ai transmis cette erreur à Copilot Agent. Il a retrouvé la mauvaise valeur et l'a corrigée dans `scoring.js`, sans modifier les tests. Après sa correction, les 52 tests ont réussi.
+## Exercice 4 — Mode versus
+
+### Question A — Quelles fonctions le refactoring a-t-il déplacées ou renommées ? Un test a-t-il échoué pendant l'opération ? Lequel, et qu'a fait l'agent ?
+
+Pour ajouter le multijoueur, nous avons créé les classes `GameInstance` et `GameManager`.
+
+`GameInstance` permet de gérer une partie avec sa propre grille, sa pièce courante et son score. `GameManager` permet de gérer plusieurs parties en même temps et de déterminer le gagnant.
+
+Nous avons aussi adapté `main.js` pour gérer le choix du mode solo ou multijoueur.
+
+Après les différentes étapes, les tests étaient tous réussis. Ils sont passés de 52 à 71 tests. Cela nous a permis de vérifier que le mode solo fonctionnait toujours.
+
+*À compléter avec le journal si un test a échoué pendant une étape intermédiaire, car le bilan final ne permet pas de le savoir.*
+
+### Question B — Comparer `git diff ex3 ex4 --stat` avec ce que vous auriez modifié à la main : l'agent a-t-il touché des fichiers inutiles ?
+
+Pour passer du mode solo au multijoueur, Copilot Agent a modifié 10 fichiers, avec 929 lignes ajoutées et 81 lignes supprimées.
+
+Il a principalement modifié `main.js`, `renderer.js`, `styles.css` et créé les classes `GameInstance` et `GameManager`, ainsi que leurs tests.
+
+À la main, j'aurais aussi dû modifier ces fichiers pour gérer plusieurs parties et afficher plusieurs grilles.
+
+Les modifications me semblent utiles pour ajouter le multijoueur. Je n'ai pas identifié de fichier clairement inutile parmi ceux modifiés.
+
+## Exercice 5 — Joueurs IA
+
+### Question A — Pourquoi exiger que l'IA joue avec les mêmes fonctions que l'humain plutôt que de poser directement la pièce dans la grille ?
+
+L'IA doit respecter les mêmes règles que le joueur humain pour que le jeu soit équitable.
+
+Si elle plaçait directement les pièces dans la grille, elle pourrait éviter certaines règles, comme les collisions ou le verrouillage.
+
+En utilisant les fonctions du moteur, on s'assure que les trois niveaux d'IA respectent les règles du Tetris.
+
+Cela permet aussi de réutiliser le code existant et de faciliter les tests.
+
+### Question B — Faire varier une pondération de l'expert avec la simulation : laquelle a le plus d'effet ? L'agent a-t-il proposé cette expérience de lui-même ?
+
+J'ai demandé à Copilot Agent de comparer les pondérations de l'IA experte en augmentant chaque coefficient de 25 %, un par un.
+
+Nous avons utilisé les mêmes trois graines pour comparer les résultats.
+
+La pondération des trous a eu le plus d'effet. En augmentant son importance, la moyenne est passée de 44,33 à 96,33 lignes complétées, soit 52 lignes supplémentaires.
+
+La hauteur a fait diminuer la moyenne à 33,33 lignes, tandis que l'irrégularité l'a augmentée à 64,67 lignes. Le coefficient des lignes complétées n'a pas changé le résultat.
+
+L'agent n'avait pas proposé cette expérience de lui-même. Je lui ai demandé de la réaliser.
+
+Ces résultats restent limités à trois simulations par variante, donc ils ne permettent pas de conclure que ce coefficient est toujours le meilleur.
+---
+
+## Exercice 6 — Documentation et revue
+
+
+### Question A — Trouver une JSDoc inexacte et la corriger
+
+J'ai demandé à Copilot de vérifier les commentaires JSDoc des fonctions de `src/core`.
+
+Il a trouvé une JSDoc incomplète dans la méthode `GameInstance.playPlacement()`.
+
+Le commentaire ne précisait pas que la méthode ne fait rien lorsque la partie est déjà terminée. Il n'expliquait pas non plus clairement que la position et l'orientation de la pièce sont modifiées avant son verrouillage.
+
+Copilot a corrigé le commentaire pour expliquer ces comportements.
+
+Seule la documentation a été modifiée, sans changer le code du jeu ni les tests.
+
+### Question B — Le diagramme de classes montre-t-il une dépendance qui n'existe pas dans le code, ou en oublie-t-il une ? Vérifier avec les imports des fichiers.
+
+Notre projet sépare la logique du jeu dans `src/core`, l'interface dans `src/ui` et le démarrage dans `main.js`.
+
+Nous avons créé le document `docs/ARCHITECTURE.md` pour expliquer les relations entre ces modules.
+
+Après la correction de la vitesse des IA, nous avons mis à jour ce document pour représenter le nouveau fonctionnement avec `advanceOpponentTurn` et `GameInstance.tick()`.
+
+Les diagrammes ont été vérifiés au niveau de leur structure, mais nous n'avons pas encore comparé systématiquement toutes leurs dépendances avec les instructions `import` du code.
+
+*Il reste à faire cette comparaison pour répondre précisément à la question.*
+
+### Question C — Parmi les remarques de la revue, laquelle était fausse ? Comment l'avez-vous établi ?
+
+Pendant la revue, Copilot a identifié deux problèmes majeurs :
+
+1. Les adversaires IA jouaient beaucoup plus vite que le joueur humain.
+2. La méthode `playPlacement()` acceptait une matrice qui ne correspondait pas à la pièce active.
+
+Nous avons corrigé ces deux problèmes et ajouté des tests. Après les corrections, les 118 tests ont réussi.
+
+Copilot a aussi signalé un problème mineur concernant la position de l'animation des lignes supprimées.
+
+Nous n'avons pas démontré qu'une des remarques était fausse. Il serait donc incorrect d'en inventer une.
+
+*Pour répondre complètement, il faut vérifier une remarque de la revue et montrer, avec le code ou un test, pourquoi elle est fausse.*
