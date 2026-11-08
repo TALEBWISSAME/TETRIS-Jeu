@@ -114,13 +114,20 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 12px 22px;
     margin: -10px 0 25px;
     color: #a4acc8;
     font-family: Consolas, "Courier New", monospace;
     font-size: 0.68rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+}
+
+.mode-picker__group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .mode-picker select {
@@ -478,6 +485,17 @@ button {
     justify-content: space-between;
     gap: 8px;
     margin-bottom: 10px;
+}
+
+.multiplayer-card__difficulty {
+    flex: 0 0 auto;
+    padding: 4px 7px;
+    border: 1px solid color-mix(in srgb, var(--pink) 38%, transparent);
+    border-radius: 999px;
+    color: #ff9add;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.03em;
 }
 
 .multiplayer-card__title {

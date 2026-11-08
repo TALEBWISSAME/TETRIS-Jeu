@@ -65,4 +65,34 @@ describe("GameManager", () => {
     it("refuse une graine non entière", () => {
         expect(() => new GameManager({ seed: 2.5 })).toThrow(TypeError);
     });
+
+    it.each(["beginner", "intermediate", "expert"])(
+        "attribue la difficulté %s uniquement aux adversaires",
+        difficulty => {
+            const manager = new GameManager({ opponents: 2, difficulty, seed: 31 });
+
+            expect(manager.humanPlayer.difficulty).toBeNull();
+            expect(manager.opponents.map(player => player.difficulty)).toEqual([
+                difficulty,
+                difficulty,
+            ]);
+            expect(manager.opponents.every(player => typeof player.aiRandom === "function")).toBe(true);
+            expect(manager.humanPlayer.aiRandom).toBeNull();
+        },
+    );
+
+    it("refuse une difficulté inconnue", () => {
+        expect(() => new GameManager({ opponents: 1, difficulty: "impossible" })).toThrow(RangeError);
+    });
+
+    it("fournit des générateurs IA indépendants et reproductibles", () => {
+        const first = new GameManager({ opponents: 2, seed: 88 });
+        const repeated = new GameManager({ opponents: 2, seed: 88 });
+        const firstValues = first.opponents.map(player => player.aiRandom());
+        const repeatedValues = repeated.opponents.map(player => player.aiRandom());
+
+        expect(new Set(first.opponents.map(player => player.aiRandom)).size).toBe(2);
+        expect(firstValues).toEqual(repeatedValues);
+        expect(firstValues[0]).not.toBe(firstValues[1]);
+    });
 });

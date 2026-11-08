@@ -172,9 +172,11 @@ function createMultiplayerCard(index) {
     header.className = "multiplayer-card__header";
     const title = document.createElement("h3");
     title.className = "multiplayer-card__title";
+    const difficulty = document.createElement("span");
+    difficulty.className = "multiplayer-card__difficulty";
     const status = document.createElement("span");
     status.className = "multiplayer-card__status";
-    header.append(title, status);
+    header.append(title, difficulty, status);
 
     const boardFrame = document.createElement("div");
     boardFrame.className = "multiplayer-card__board-frame";
@@ -201,7 +203,7 @@ function createMultiplayerCard(index) {
         throw new Error("Le navigateur ne permet pas le rendu HTML5 Canvas.");
     }
 
-    return { card, title, status, canvas, context, gameOver, score, level, lines };
+    return { card, title, difficulty, status, canvas, context, gameOver, score, level, lines };
 }
 
 function createStatistic(container, label) {
@@ -298,6 +300,15 @@ export function createMultiplayerRenderer({ container }) {
                 ? "Joueur humain"
                 : `Adversaire ${players.slice(0, index + 1).filter(item => item.role === "opponent").length}`;
             view.title.textContent = label;
+            const difficultyLabels = {
+                beginner: "Débutant",
+                intermediate: "Intermédiaire",
+                expert: "Expert",
+            };
+            view.difficulty.hidden = player.role === "human";
+            view.difficulty.textContent = player.role === "opponent"
+                ? `IA ${difficultyLabels[player.difficulty] ?? "inconnue"}`
+                : "";
             view.card.classList.toggle("multiplayer-card--human", player.role === "human");
             view.card.classList.toggle("multiplayer-card--opponent", player.role === "opponent");
             view.canvas.setAttribute("aria-label", `Plateau : ${label}`);

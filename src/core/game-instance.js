@@ -5,6 +5,7 @@ import {
     softDrop,
     tick,
 } from "./game.js";
+import { canPlacePiece } from "./grid.js";
 
 /** Représente une partie indépendante en s'appuyant sur le moteur de jeu existant. */
 export class GameInstance {
@@ -66,6 +67,31 @@ export class GameInstance {
 
     /** Effectue une étape de descente automatique. */
     tick() {
+        tick(this.state);
+        return this;
+    }
+
+    /** Verrouille un placement final légal en laissant le moteur appliquer les règles. */
+    playPlacement(placement) {
+        if (this.state.status !== "playing") {
+            return this;
+        }
+        if (
+            !placement
+            || !Array.isArray(placement.matrix)
+            || !Number.isInteger(placement.x)
+            || !Number.isInteger(placement.y)
+            || !canPlacePiece(this.state.grid, placement.matrix, placement.x, placement.y)
+            || canPlacePiece(this.state.grid, placement.matrix, placement.x, placement.y + 1)
+        ) {
+            throw new Error("Le placement doit être une position finale légale.");
+        }
+
+        Object.assign(this.state.currentPiece, {
+            matrix: placement.matrix.map(row => [...row]),
+            x: placement.x,
+            y: placement.y,
+        });
         tick(this.state);
         return this;
     }

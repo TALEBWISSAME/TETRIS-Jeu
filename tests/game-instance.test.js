@@ -75,4 +75,39 @@ describe("GameInstance", () => {
         expect(instance.currentPiece.type).toBe("T");
         expect(other.state.random).not.toBe(random);
     });
+
+    it("applique un placement final légal via le moteur et met à jour le score", () => {
+        const instance = new GameInstance({ seed: 12 });
+        const previousPiece = instance.currentPiece;
+        instance.currentPiece.matrix = [[1]];
+        instance.currentPiece.x = 0;
+        instance.currentPiece.y = 19;
+        instance.grid[19] = Array(10).fill(1);
+        instance.grid[19][0] = 0;
+
+        expect(instance.playPlacement({
+            matrix: [[1]],
+            x: 0,
+            y: 19,
+        })).toBe(instance);
+
+        expect(instance.state.grid[19]).toEqual(Array(10).fill(0));
+        expect(instance.score).toBe(100);
+        expect(instance.linesCleared).toBe(1);
+        expect(instance.currentPiece).not.toBe(previousPiece);
+    });
+
+    it("refuse un placement illégal sans modifier la partie", () => {
+        const instance = new GameInstance({ seed: 22 });
+        const gridBefore = instance.grid.map(row => [...row]);
+        const pieceBefore = { ...instance.currentPiece, matrix: instance.currentPiece.matrix };
+
+        expect(() => instance.playPlacement({
+            matrix: [[1]],
+            x: -1,
+            y: 19,
+        })).toThrow("Le placement doit être une position finale légale.");
+        expect(instance.grid).toEqual(gridBefore);
+        expect(instance.currentPiece).toEqual(pieceBefore);
+    });
 });

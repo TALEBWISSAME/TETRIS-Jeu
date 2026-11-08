@@ -20,13 +20,23 @@
         </header>
 
         <div class="mode-picker">
-            <label for="game-mode">Mode de jeu</label>
-            <select id="game-mode">
-                <option value="0">Solo</option>
-                <option value="1">Contre 1 adversaire</option>
-                <option value="2">Contre 2 adversaires</option>
-                <option value="3">Contre 3 adversaires</option>
-            </select>
+            <div class="mode-picker__group">
+                <label for="game-mode">Mode de jeu</label>
+                <select id="game-mode">
+                    <option value="0">Solo</option>
+                    <option value="1">Contre 1 adversaire</option>
+                    <option value="2">Contre 2 adversaires</option>
+                    <option value="3">Contre 3 adversaires</option>
+                </select>
+            </div>
+            <div class="mode-picker__group" id="difficulty-picker" hidden>
+                <label for="ai-difficulty">Difficulté IA</label>
+                <select id="ai-difficulty">
+                    <option value="beginner">Débutant</option>
+                    <option value="intermediate">Intermédiaire</option>
+                    <option value="expert">Expert</option>
+                </select>
+            </div>
         </div>
 
         <section class="game-layout" aria-label="Jeu Tetris">

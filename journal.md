@@ -246,3 +246,15 @@ Copilot a ajouté la fonction `chooseExpertPlacement` dans `ai.js`. Elle peut au
 Pendant les tests, Copilot a trouvé une erreur dans la valeur attendue pour l'irrégularité d'une grille. Il a corrigé cette valeur et relancé les tests.
 
 Résultat : 99 tests réussis sur 99. Seuls `ai.js` et `ai.test.js` ont été modifiés.
+
+### Exercice 5 — Étape 5 : Intégration des IA
+
+J'ai demandé à Copilot Agent d'intégrer les trois niveaux d'IA dans le mode multijoueur.
+
+Copilot a modifié le gestionnaire des parties, les instances de jeu et l'interface pour permettre de choisir la difficulté des adversaires.
+
+J'ai testé le jeu dans mon navigateur avec trois adversaires en mode Intermédiaire puis Expert. Les adversaires placent leurs pièces automatiquement et peuvent supprimer des lignes.
+
+J'ai remarqué des blocs colorés en haut de certaines grilles. J'ai demandé à Copilot de vérifier ce comportement. Il a confirmé qu'il s'agissait des nouvelles pièces actives qui apparaissent après chaque placement, et non d'un bug.
+
+Résultat : 111 tests réussis sur 111. Aucune correction supplémentaire n'a été nécessaire.
