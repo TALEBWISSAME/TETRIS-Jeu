@@ -258,3 +258,20 @@ J'ai testé le jeu dans mon navigateur avec trois adversaires en mode Intermédi
 J'ai remarqué des blocs colorés en haut de certaines grilles. J'ai demandé à Copilot de vérifier ce comportement. Il a confirmé qu'il s'agissait des nouvelles pièces actives qui apparaissent après chaque placement, et non d'un bug.
 
 Résultat : 111 tests réussis sur 111. Aucune correction supplémentaire n'a été nécessaire.
+
+### Exercice 5 — Étape 6 : Comparaison des IA
+
+J'ai demandé à Copilot Agent de comparer les performances des trois IA avec des simulations.
+
+Il a créé `ai-simulation.test.js` pour faire jouer les IA sur trois graines fixes, avec la même suite de pièces pour chaque niveau.
+
+Les résultats moyens sont :
+- IA débutante : 33 points, 0,33 ligne et 19 pièces placées.
+- IA intermédiaire : 1 333 points, 10,33 lignes et 55 pièces placées.
+- IA experte : 5 033 points, 44,33 lignes et 142 pièces placées.
+
+L'IA experte a donc obtenu de meilleurs résultats que la débutante dans ces simulations.
+
+Copilot a utilisé une distribution avec 70 % de pièces S/Z pour obtenir des parties complètes assez rapidement. Les résultats concernent donc ce scénario précis.
+
+Résultat : 112 tests réussis sur 112. Aucun fichier existant n'a été modifié.
