@@ -109,5 +109,5 @@ describe("simulation comparative des IA", () => {
             expect(results[difficulty].every(result => result.placedPieces < MAX_PLACED_PIECES))
                 .toBe(true);
         }
-    });
+    }, 60_000);
 });

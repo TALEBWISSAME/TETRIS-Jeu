@@ -275,3 +275,17 @@ L'IA experte a donc obtenu de meilleurs résultats que la débutante dans ces si
 Copilot a utilisé une distribution avec 70 % de pièces S/Z pour obtenir des parties complètes assez rapidement. Les résultats concernent donc ce scénario précis.
 
 Résultat : 112 tests réussis sur 112. Aucun fichier existant n'a été modifié.
+
+### Exercice 5 — Étape 7 : Validation finale
+
+J'ai demandé à Copilot Agent de vérifier l'ensemble de l'exercice 5.
+
+Il a lancé les tests, calculé la couverture et vérifié la syntaxe des fichiers JavaScript.
+
+Au début, le test de simulation dépassait le délai de 5 secondes pendant le calcul de couverture. Copilot a augmenté le délai autorisé pour ce test à 60 secondes, sans modifier les scénarios ni les résultats attendus.
+
+Après cette correction, tous les tests passent.
+
+Résultat : 112 tests réussis sur 112 et 94,97 % de couverture des instructions.
+
+Les trois niveaux d'IA sont fonctionnels. Les simulations montrent que l'IA experte obtient de meilleurs résultats que l'IA débutante sur les graines testées.
