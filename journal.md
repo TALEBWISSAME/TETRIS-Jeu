@@ -194,3 +194,15 @@ Pendant les vérifications, Copilot a rencontré un problème avec les boutons q
 J'ai ensuite testé le jeu dans mon navigateur avec trois adversaires. Les quatre grilles s'affichent, les pièces descendent et les flèches contrôlent uniquement mon joueur. J'ai aussi vérifié que les boutons Pause et Reprendre fonctionnent.
 
 Résultat : 71 tests réussis sur 71. Aucune intelligence artificielle n'a encore été ajoutée.
+
+### Exercice 4 — Étape 5 : Validation finale
+
+J'ai demandé à Copilot Agent de vérifier le fonctionnement complet du mode multijoueur.
+
+Il a testé les modes solo et multijoueur avec 1 à 3 adversaires. Il a aussi vérifié les commandes du joueur humain, la descente automatique des pièces, la pause, la reprise, le redémarrage et le changement de mode.
+
+Copilot a également vérifié les couleurs des pièces verrouillées et l'animation de suppression des lignes.
+
+Résultat : 71 tests réussis sur 71 et 91,74 % de couverture des instructions.
+
+Aucun bug n'a été détecté pendant cette validation. Aucun fichier n'a été modifié et aucun test supplémentaire n'a été nécessaire.
