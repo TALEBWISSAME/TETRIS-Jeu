@@ -89,3 +89,15 @@ Copilot a créé src/core/scoring.js et tests/scoring.test.js. Le score dépend 
 J'ai vérifié le code et les cas de test proposés, notamment les valeurs invalides et les changements de niveau.
 
 Nombre d'itérations : 1 demande, sans correction supplémentaire.
+
+### Exercice 2 — Étape 3 : Moteur du jeu
+
+J'ai utilisé le mode Agent de GitHub Copilot pour développer le moteur du Tetris. Je lui ai demandé de gérer les déplacements, les rotations, les collisions, la descente des pièces, le score, les niveaux et la fin de partie.
+
+Copilot a créé src/core/game.js et tests/game.test.js, en réutilisant les fichiers déjà développés.
+
+Lors du premier lancement des tests, trois problèmes ont été détectés dans les scénarios de test. Copilot a corrigé les tests et relancé plusieurs fois npm test avant d'obtenir un résultat correct.
+
+Au final, les 40 tests sont passés dans 4 fichiers. Aucun fichier existant n'a été modifié.
+
+Nombre d'itérations : plusieurs corrections et relances des tests ont été nécessaires.
