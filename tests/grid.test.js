@@ -40,6 +40,47 @@ describe("grille", () => {
         expect(canPlacePiece(occupiedGrid, [[1]], 0, 0)).toBe(false);
     });
 
+    it("autorise un placement qui touche les bords droit et inférieur", () => {
+        const grid = createGrid();
+        const piece = [
+            [1, 1],
+            [0, 1],
+        ];
+
+        expect(canPlacePiece(grid, piece, GRID_WIDTH - 2, GRID_HEIGHT - 2)).toBe(true);
+    });
+
+    it("rejette les coordonnées non entières et les matrices de pièce invalides", () => {
+        const grid = createGrid();
+
+        expect(() => canPlacePiece(grid, [[1]], 0.5, 0)).toThrow(
+            "La position de la pièce doit utiliser des coordonnées entières.",
+        );
+        expect(() => canPlacePiece(grid, [[1]], 0, Number.NaN)).toThrow(
+            "La position de la pièce doit utiliser des coordonnées entières.",
+        );
+        expect(() => canPlacePiece(grid, [[1, 1]], 0, 0)).toThrow(
+            "La pièce doit être une matrice carrée composée de 0 et de 1.",
+        );
+        expect(() => canPlacePiece(grid, [[2]], 0, 0)).toThrow(
+            "La pièce doit être une matrice carrée composée de 0 et de 1.",
+        );
+    });
+
+    it("rejette une grille de dimensions ou de contenu invalide", () => {
+        const grid = createGrid();
+        const shortGrid = grid.slice(1);
+        const invalidCellGrid = grid.map(row => [...row]);
+        invalidCellGrid[0][0] = 2;
+
+        expect(() => canPlacePiece(shortGrid, [[1]], 0, 0)).toThrow(
+            "La grille doit contenir 20 lignes de 10 cases binaires.",
+        );
+        expect(() => canPlacePiece(invalidCellGrid, [[1]], 0, 0)).toThrow(
+            "La grille doit contenir 20 lignes de 10 cases binaires.",
+        );
+    });
+
     it("verrouille une pièce sans modifier la grille d'origine", () => {
         const grid = createGrid();
         const piece = [
@@ -51,6 +92,7 @@ describe("grille", () => {
 
         expect(nextGrid[4].slice(3, 5)).toEqual([1, 1]);
         expect(nextGrid[5][4]).toBe(1);
+        expect(nextGrid[5][3]).toBe(0);
         expect(grid.flat().every(cell => cell === 0)).toBe(true);
         expect(() => placePiece(grid, piece, -1, 0)).toThrow(
             "La pièce ne peut pas être placée à cette position.",
@@ -71,5 +113,39 @@ describe("grille", () => {
             Array(GRID_WIDTH - 1).fill(0),
         );
         expect(grid[GRID_HEIGHT - 1]).toEqual(Array(GRID_WIDTH).fill(1));
+    });
+
+    it("ne modifie pas la grille lorsqu'aucune ligne n'est complète", () => {
+        const grid = createGrid();
+        grid[GRID_HEIGHT - 1][0] = 1;
+        grid[GRID_HEIGHT - 2][GRID_WIDTH - 1] = 1;
+
+        const result = clearFullRows(grid);
+
+        expect(result.clearedRows).toBe(0);
+        expect(result.grid).toEqual(grid);
+        expect(result.grid).not.toBe(grid);
+        expect(result.grid[0]).not.toBe(grid[0]);
+    });
+
+    it("supprime plusieurs lignes simultanément en conservant l'ordre des autres", () => {
+        const grid = createGrid();
+        grid[0][0] = 1;
+        grid[3][1] = 1;
+        grid[5] = Array(GRID_WIDTH).fill(1);
+        grid[10] = Array(GRID_WIDTH).fill(1);
+        grid[15][2] = 1;
+
+        const result = clearFullRows(grid);
+        const expectedRemainingRows = grid.filter(row => row.some(cell => cell === 0));
+
+        expect(result.clearedRows).toBe(2);
+        expect(result.grid.slice(0, 2)).toEqual([
+            Array(GRID_WIDTH).fill(0),
+            Array(GRID_WIDTH).fill(0),
+        ]);
+        expect(result.grid.slice(2)).toEqual(expectedRemainingRows);
+        expect(grid[5]).toEqual(Array(GRID_WIDTH).fill(1));
+        expect(grid[10]).toEqual(Array(GRID_WIDTH).fill(1));
     });
 });

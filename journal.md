@@ -127,3 +127,25 @@ J'ai ensuite demandé une correction pour mieux gérer les couleurs des pièces 
 Résultat : 44 tests réussis. J'ai également testé le jeu dans mon navigateur. Les déplacements, la rotation et la suppression des lignes fonctionnent, et le score augmente.
 
 J'ai conservé les modifications après ces vérifications.
+
+### Exercice 3 — Complément des tests
+
+J'ai d'abord utilisé Copilot en mode Ask pour analyser les tests existants. Il a repéré des cas manquants, notamment pour les limites de la grille et la suppression de plusieurs lignes.
+
+J'ai ensuite utilisé le mode Agent pour compléter les tests. Copilot a ajouté cinq tests dans `grid.test.js`, sans modifier le moteur. Les 49 tests passent.
+
+### Exercice 3 — Tests et couverture
+
+J'ai commencé par utiliser Copilot en mode Ask pour vérifier les tests déjà présents et repérer ceux qui manquaient.
+
+Ensuite, avec le mode Agent, j'ai complété les tests de la grille. Copilot a ajouté 5 tests et nous sommes passés de 44 à 49 tests réussis.
+
+J'ai ensuite utilisé la complétion automatique de Copilot dans `piece.test.js` pour écrire trois tests : les quatre orientations de T, une collision contre le bord droit et une collision avec une case déjà occupée. J'ai dû corriger une proposition de Copilot qui utilisait une grille de mauvaise taille et attendait une exception au lieu de `false`.
+
+Après ces modifications, les 52 tests passaient.
+
+J'ai installé `@vitest/coverage-v8` et ajouté la commande `npm run coverage`. J'ai obtenu 93,79 % de couverture des lignes pour `src/core`, ce qui dépasse les 80 % demandés.
+
+Enfin, j'ai volontairement modifié `scoring.js` pour donner 300 points au lieu de 500 lorsque trois lignes sont supprimées. Un test a échoué. J'ai demandé à Copilot Agent de corriger le code à partir de l'erreur du terminal. Il a remis la bonne valeur dans `scoring.js` sans modifier les tests.
+
+Après la correction, les 52 tests ont de nouveau réussi.
