@@ -42,13 +42,48 @@ function drawCell(context, x, y, size, color, glow = true) {
     context.restore();
 }
 
-function drawBoard(context, game, width, height) {
+function drawLineClear(context, rows, progress, width, height) {
+    if (!rows?.length || progress >= 1) {
+        return;
+    }
+
+    const cellHeight = height / GRID_HEIGHT;
+    const cellWidth = width / GRID_WIDTH;
+    const clearedBandHeight = rows.length * cellHeight;
+    const glow = Math.sin(progress * Math.PI);
+    context.save();
+    // Le compactage laisse autant de nouvelles lignes vides en haut de la grille.
+    context.beginPath();
+    context.rect(0, 0, width, clearedBandHeight);
+    context.clip();
+    context.globalAlpha = glow;
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+        const y = rowIndex * cellHeight - progress * clearedBandHeight;
+        for (let x = 0; x < GRID_WIDTH; x++) {
+            const color = CELL_COLORS[rows[rowIndex][x]];
+            if (color) {
+                drawCell(context, x * cellWidth, y, Math.min(cellWidth, cellHeight), color);
+            }
+        }
+    }
+    context.restore();
+}
+
+function drawBoard(context, game, width, height, lockedColors, lineClear) {
     const cellWidth = width / GRID_WIDTH;
     const cellHeight = height / GRID_HEIGHT;
 
     context.clearRect(0, 0, width, height);
     context.fillStyle = "#080d1b";
     context.fillRect(0, 0, width, height);
+
+    drawLineClear(
+        context,
+        lineClear?.rows,
+        lineClear?.progress ?? 1,
+        width,
+        height,
+    );
 
     for (let y = 0; y < GRID_HEIGHT; y++) {
         for (let x = 0; x < GRID_WIDTH; x++) {
@@ -58,7 +93,7 @@ function drawBoard(context, game, width, height) {
                     x * cellWidth,
                     y * cellHeight,
                     Math.min(cellWidth, cellHeight),
-                    LOCKED_CELL_COLOR,
+                    CELL_COLORS[lockedColors?.[y]?.[x]] ?? LOCKED_CELL_COLOR,
                 );
             }
         }
@@ -151,8 +186,15 @@ export function createRenderer({
         throw new Error("Le navigateur ne permet pas le rendu HTML5 Canvas.");
     }
 
-    return function render(game) {
-        drawBoard(boardContext, game, boardCanvas.width, boardCanvas.height);
+    return function render(game, { lockedColors, lineClear } = {}) {
+        drawBoard(
+            boardContext,
+            game,
+            boardCanvas.width,
+            boardCanvas.height,
+            lockedColors,
+            lineClear,
+        );
         drawPreview(nextContext, game.nextPieceType, nextCanvas.width, nextCanvas.height);
         scoreElement.textContent = game.score.toLocaleString("fr-FR");
         levelElement.textContent = String(game.level);

@@ -117,3 +117,13 @@ Nombre d'itérations : une correction du CSS après une erreur d'application.
 Après avoir vérifié les fichiers créés, j'ai demandé à Copilot d'ajouter des identifiants aux trois boutons pour faciliter leur utilisation à l'étape suivante. Copilot a modifié uniquement `index.html`, sans brancher les boutons.
 
 J'ai conservé cette modification. Les 40 tests annoncés précédemment étaient réussis. Je testerai l'interface complète lorsque le jeu sera fonctionnel.
+
+### Exercice 2 — Étape 5 : Jeu fonctionnel
+
+J'ai utilisé GitHub Copilot en mode Agent pour rendre mon Tetris jouable. Copilot a créé `main.js` et `src/ui/input.js` pour relier le moteur à l'interface.
+
+J'ai ensuite demandé une correction pour mieux gérer les couleurs des pièces verrouillées et l'animation de suppression des lignes. Copilot a ajouté `src/ui/locked-colors.js` et des tests. Plusieurs essais ont été nécessaires avant que tous les tests passent.
+
+Résultat : 44 tests réussis. J'ai également testé le jeu dans mon navigateur. Les déplacements, la rotation et la suppression des lignes fonctionnent, et le score augmente.
+
+J'ai conservé les modifications après ces vérifications.
