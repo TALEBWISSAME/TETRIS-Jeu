@@ -62,3 +62,20 @@
 - Modifications acceptées ou corrigées : J'ai utilisé Restore checkpoint pour annuler le renommage et retrouver la fonction rotate.
 - Nombre d'itérations : 1.
 - Observation : Le checkpoint permet d'annuler les changements d'une intervention de l'Agent sans recommencer tout le travail.
+
+
+## Exercice 2 — Préparation du plan
+
+J'ai utilisé le mode Plan/Ask de GitHub Copilot pour préparer le développement du Tetris à partir de SPEC.md. La première proposition contenait des noms de fichiers différents de ceux demandés dans le TP et oubliait grid.js. J'ai donc demandé à Copilot de corriger son plan. La deuxième proposition respecte l'architecture et contient cinq étapes. Je l'ai validée et enregistrée dans docs/PLAN.md.
+
+Nombre d'itérations : 2 propositions.
+
+### Exercice 2 — Étape 1 : Grille et pièces
+
+J'ai utilisé le mode Agent de GitHub Copilot pour réaliser la première étape du plan. Je lui ai demandé de créer la grille du Tetris et ses tests, sans modifier les fichiers de l'exercice 1.
+
+Copilot a créé src/core/grid.js et tests/grid.test.js. Il a ajouté les fonctions nécessaires pour créer la grille, vérifier les placements, verrouiller les pièces et supprimer les lignes complètes.
+
+L'Agent a exécuté npm test : les 8 tests sont passés dans 2 fichiers.
+
+Nombre d'itérations : 1 demande, sans correction supplémentaire pour le moment.
