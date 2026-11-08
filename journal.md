@@ -226,3 +226,13 @@ Copilot a ajouté la fonction `chooseBeginnerPlacement` dans `ai.js`. Elle utili
 Il a aussi ajouté 6 tests pour vérifier les placements, les tirages reproductibles, les cas où aucun placement n'est possible et l'absence de modification de la grille.
 
 Résultat : 83 tests réussis sur 83. Aucun autre fichier n'a été modifié.
+
+### Exercice 5 — Étape 3 : IA intermédiaire
+
+J'ai demandé à Copilot Agent de créer une IA intermédiaire qui choisit un placement en fonction de la grille.
+
+Copilot a ajouté `chooseIntermediatePlacement` dans `ai.js`. Cette fonction simule les placements possibles, favorise les lignes complétées et pénalise les trous ainsi que les hauteurs trop importantes.
+
+En cas d'égalité, l'IA garde le premier placement trouvé. Copilot a aussi ajusté un scénario de test pour mieux vérifier la pénalité des trous.
+
+Résultat : 91 tests réussis sur 91. Les données de la partie ne sont pas modifiées et aucun autre fichier n'a été changé.
