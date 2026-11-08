@@ -1,14 +1,9 @@
-import {
-    createGame,
-    movePiece,
-    rotatePiece,
-    softDrop,
-    tick,
-} from "./src/core/game.js";
+import { movePiece, rotatePiece, softDrop, tick } from "./src/core/game.js";
 import { GRID_HEIGHT, GRID_WIDTH } from "./src/core/grid.js";
+import { GameManager } from "./src/core/game-manager.js";
 import { bindInput } from "./src/ui/input.js";
 import { applyLockedPiece } from "./src/ui/locked-colors.js";
-import { createRenderer } from "./src/ui/renderer.js";
+import { createMultiplayerRenderer, createRenderer } from "./src/ui/renderer.js";
 
 function getElement(id) {
     const element = document.getElementById(id);
@@ -18,8 +13,13 @@ function getElement(id) {
     return element;
 }
 
+function createColorGrid() {
+    return Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(null));
+}
+
 const pauseButton = getElement("pause-button");
-const render = createRenderer({
+const modeSelect = getElement("game-mode");
+const soloRenderer = createRenderer({
     boardCanvas: getElement("game-board"),
     nextCanvas: getElement("next-piece"),
     scoreElement: getElement("score"),
@@ -27,133 +27,215 @@ const render = createRenderer({
     linesElement: getElement("lines"),
     gameOverElement: getElement("game-over"),
 });
+const multiplayerRenderer = createMultiplayerRenderer({
+    container: getElement("multiplayer-games"),
+});
 
 let seed = Date.now() >>> 0;
-let game = createGame({ seed });
-let lockedColors = createColorGrid();
-let isRunning = false;
-let isPaused = false;
-let timerId = null;
-let lineClearAnimation = null;
+let opponentCount = Number(modeSelect.value);
+let manager = null;
+let runtimes = [];
+let modeIsMultiplayer = false;
 
-function createColorGrid() {
-    return Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(null));
+function makeRuntime(player, game, isHuman) {
+    return {
+        player,
+        game,
+        isHuman,
+        lockedColors: createColorGrid(),
+        isRunning: false,
+        isPaused: false,
+        timerId: null,
+        lineClearAnimation: null,
+    };
 }
 
-function draw() {
-    const lineClear = lineClearAnimation
+function createGameRuntimes() {
+    modeIsMultiplayer = opponentCount > 0;
+    manager = new GameManager({ opponents: opponentCount, seed });
+    return manager.players.map(player =>
+        makeRuntime(player, player.game.state, player.role === "human")
+    );
+}
+
+function drawRuntime(runtime) {
+    const lineClear = runtime.lineClearAnimation
         ? {
-            rows: lineClearAnimation.rows,
+            rows: runtime.lineClearAnimation.rows,
             progress: Math.min(
-                (performance.now() - lineClearAnimation.startedAt) / lineClearAnimation.duration,
+                (performance.now() - runtime.lineClearAnimation.startedAt)
+                    / runtime.lineClearAnimation.duration,
                 1,
             ),
         }
         : undefined;
-    render(game, { lockedColors, lineClear });
+    soloRenderer(runtime.game, { lockedColors: runtime.lockedColors, lineClear });
 }
 
-function animateLineClear(animation) {
-    if (lineClearAnimation !== animation) {
+function draw() {
+    if (modeIsMultiplayer) {
+        multiplayerRenderer.renderPlayers(runtimes.map(runtime => ({
+            ...runtime.player,
+            game: runtime.game,
+            isPaused: runtime.isPaused,
+            lockedColors: runtime.lockedColors,
+            lineClear: runtime.lineClearAnimation
+                ? {
+                    rows: runtime.lineClearAnimation.rows,
+                    progress: Math.min(
+                        (performance.now() - runtime.lineClearAnimation.startedAt)
+                            / runtime.lineClearAnimation.duration,
+                        1,
+                    ),
+                }
+                : undefined,
+        })));
+    } else {
+        multiplayerRenderer.showSolo();
+        drawRuntime(runtimes[0]);
+    }
+}
+
+function animateLineClear(runtime, animation) {
+    if (runtime.lineClearAnimation !== animation) {
         return;
     }
-
     if (performance.now() - animation.startedAt >= animation.duration) {
-        lineClearAnimation = null;
+        runtime.lineClearAnimation = null;
         draw();
         return;
     }
-
     draw();
-    requestAnimationFrame(() => animateLineClear(animation));
+    requestAnimationFrame(() => animateLineClear(runtime, animation));
 }
 
-function updateLockedColors(previousGrid, piece, nextGrid) {
-    const result = applyLockedPiece(previousGrid, lockedColors, piece, nextGrid);
-    lockedColors = result.lockedColors;
-
+function syncLockedColors(runtime, previousGrid, piece, nextGrid) {
+    const result = applyLockedPiece(previousGrid, runtime.lockedColors, piece, nextGrid);
+    runtime.lockedColors = result.lockedColors;
     if (result.removedRows.length > 0) {
         const animation = {
             rows: result.removedRows,
             startedAt: performance.now(),
             duration: 360,
         };
-        lineClearAnimation = animation;
-        requestAnimationFrame(() => animateLineClear(animation));
+        runtime.lineClearAnimation = animation;
+        requestAnimationFrame(() => animateLineClear(runtime, animation));
     }
 }
 
-function perform(action) {
-    if (!isRunning || isPaused || game.status !== "playing") {
+function perform(runtime, action) {
+    if (!runtime.isRunning || runtime.isPaused || runtime.game.status !== "playing") {
         return;
     }
 
-    const previousPiece = game.currentPiece;
-    const previousGrid = game.grid;
-    action(game);
-    if (previousPiece && game.grid !== previousGrid) {
-        updateLockedColors(previousGrid, previousPiece, game.grid);
+    const previousPiece = runtime.game.currentPiece;
+    const previousGrid = runtime.game.grid;
+    action(runtime);
+    if (previousPiece && runtime.game.grid !== previousGrid) {
+        syncLockedColors(runtime, previousGrid, previousPiece, runtime.game.grid);
     }
     draw();
 }
 
-function clearTimer() {
-    if (timerId !== null) {
-        clearTimeout(timerId);
-        timerId = null;
+function clearTimer(runtime) {
+    if (runtime.timerId !== null) {
+        clearTimeout(runtime.timerId);
+        runtime.timerId = null;
     }
 }
 
-function scheduleTick() {
-    clearTimer();
-    if (!isRunning || isPaused || game.status !== "playing") {
+function scheduleTick(runtime) {
+    clearTimer(runtime);
+    if (!runtime.isRunning || runtime.isPaused || runtime.game.status !== "playing") {
         return;
     }
 
-    timerId = setTimeout(() => {
-        timerId = null;
-        perform(tick);
-        scheduleTick();
-    }, game.dropIntervalMs);
+    runtime.timerId = setTimeout(() => {
+        runtime.timerId = null;
+        perform(runtime, item => {
+            if (runtime.player.role === "human") {
+                tick(item.game);
+            } else {
+                runtime.player.game.tick();
+            }
+        });
+        scheduleTick(runtime);
+    }, runtime.game.dropIntervalMs);
+}
+
+function scheduleAllTicks() {
+    runtimes.forEach(scheduleTick);
+}
+
+function updatePauseLabel() {
+    const activeGames = runtimes.filter(runtime =>
+        runtime.isRunning && runtime.game.status === "playing"
+    );
+    pauseButton.textContent = activeGames.length > 0
+        && activeGames.every(runtime => runtime.isPaused)
+        ? "Reprendre"
+        : "Pause";
 }
 
 function startGame() {
-    if (game.status === "gameover") {
-        return;
+    for (const runtime of runtimes) {
+        if (runtime.game.status === "playing") {
+            runtime.isRunning = true;
+            runtime.isPaused = false;
+        }
     }
-    isRunning = true;
-    isPaused = false;
-    pauseButton.textContent = "Pause";
+    updatePauseLabel();
     draw();
-    scheduleTick();
+    scheduleAllTicks();
 }
 
 function togglePause() {
-    if (!isRunning || game.status !== "playing") {
+    const activeGames = runtimes.filter(runtime =>
+        runtime.isRunning && runtime.game.status === "playing"
+    );
+    if (activeGames.length === 0) {
         return;
     }
-    isPaused = !isPaused;
-    pauseButton.textContent = isPaused ? "Reprendre" : "Pause";
-    if (isPaused) {
-        clearTimer();
-    } else {
-        scheduleTick();
+
+    const shouldPause = activeGames.some(runtime => !runtime.isPaused);
+    for (const runtime of activeGames) {
+        runtime.isPaused = shouldPause;
+        if (shouldPause) {
+            clearTimer(runtime);
+        } else {
+            scheduleTick(runtime);
+        }
     }
+    updatePauseLabel();
     draw();
 }
 
-function restartGame() {
-    clearTimer();
+function resetGames({ start = false } = {}) {
+    runtimes.forEach(clearTimer);
     seed = (seed + 1) >>> 0;
-    game = createGame({ seed });
-    lockedColors = createColorGrid();
-    lineClearAnimation = null;
-    isRunning = true;
-    isPaused = false;
-    pauseButton.textContent = "Pause";
+    runtimes = createGameRuntimes();
+    if (start) {
+        for (const runtime of runtimes) {
+            runtime.isRunning = true;
+        }
+    }
+    updatePauseLabel();
     draw();
-    scheduleTick();
+    if (start) {
+        scheduleAllTicks();
+    }
 }
+
+function changeMode() {
+    const selected = Number(modeSelect.value);
+    if (!Number.isInteger(selected) || selected < 0 || selected > 3) {
+        throw new RangeError("Le mode doit comporter de zéro à trois adversaires.");
+    }
+    opponentCount = selected;
+    resetGames();
+}
+
+const humanRuntime = () => runtimes.find(runtime => runtime.isHuman);
 
 bindInput({
     startButton: getElement("start-button"),
@@ -161,10 +243,46 @@ bindInput({
     restartButton: getElement("restart-button"),
     onStart: startGame,
     onPause: togglePause,
-    onRestart: restartGame,
-    onMove: direction => perform(currentGame => movePiece(currentGame, direction)),
-    onRotate: () => perform(rotatePiece),
-    onSoftDrop: () => perform(softDrop),
+    onRestart: () => resetGames({ start: true }),
+    onMove: direction => {
+        const runtime = humanRuntime();
+        if (runtime) {
+            perform(runtime, item => {
+                if (modeIsMultiplayer) {
+                    item.player.game.move(direction);
+                } else {
+                    movePiece(item.game, direction);
+                }
+            });
+        }
+    },
+    onRotate: () => {
+        const runtime = humanRuntime();
+        if (runtime) {
+            perform(runtime, item => {
+                if (modeIsMultiplayer) {
+                    item.player.game.rotate();
+                } else {
+                    rotatePiece(item.game);
+                }
+            });
+        }
+    },
+    onSoftDrop: () => {
+        const runtime = humanRuntime();
+        if (runtime) {
+            perform(runtime, item => {
+                if (modeIsMultiplayer) {
+                    item.player.game.softDrop();
+                } else {
+                    softDrop(item.game);
+                }
+            });
+        }
+    },
 });
 
+modeSelect.addEventListener("change", changeMode);
+runtimes = createGameRuntimes();
+updatePauseLabel();
 draw();

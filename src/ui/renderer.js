@@ -266,7 +266,8 @@ export function createMultiplayerRenderer({ container }) {
         throw new Error("Le conteneur doit inclure un élément .multiplayer-grid.");
     }
 
-    const soloLayout = container.closest(".arcade")?.querySelector(".game-layout");
+    const arcade = container.closest(".arcade");
+    const soloLayout = arcade?.querySelector(".game-layout");
     const cards = new Map();
     function renderPlayers(players) {
         if (!Array.isArray(players) || players.length < 1 || players.length > 4) {
@@ -277,8 +278,8 @@ export function createMultiplayerRenderer({ container }) {
         }
 
         container.hidden = false;
-        if (soloLayout) {
-            soloLayout.hidden = true;
+        if (arcade) {
+            arcade.classList.add("arcade--multiplayer");
         }
         grid.dataset.playerCount = String(players.length);
         const activeCards = [];
@@ -302,12 +303,27 @@ export function createMultiplayerRenderer({ container }) {
             view.canvas.setAttribute("aria-label", `Plateau : ${label}`);
 
             const game = player.game;
-            drawBoard(view.context, game, view.canvas.width, view.canvas.height);
+            drawBoard(
+                view.context,
+                game,
+                view.canvas.width,
+                view.canvas.height,
+                player.lockedColors,
+                player.lineClear,
+            );
             view.score.textContent = game.score.toLocaleString("fr-FR");
             view.level.textContent = String(game.level);
             view.lines.textContent = String(game.linesCleared);
-            view.status.textContent = game.status === "gameover" ? "Terminée" : "En cours";
+            view.status.textContent = game.status === "gameover"
+                ? "Terminée"
+                : player.isPaused
+                    ? "En pause"
+                    : "En cours";
             view.status.classList.toggle("multiplayer-card__status--ended", game.status === "gameover");
+            view.status.classList.toggle(
+                "multiplayer-card__status--paused",
+                game.status !== "gameover" && player.isPaused,
+            );
             view.gameOver.hidden = game.status !== "gameover";
             activeCards.push(view.card);
         });
@@ -329,8 +345,8 @@ export function createMultiplayerRenderer({ container }) {
 
     function showSolo() {
         container.hidden = true;
-        if (soloLayout) {
-            soloLayout.hidden = false;
+        if (arcade) {
+            arcade.classList.remove("arcade--multiplayer");
         }
     }
 

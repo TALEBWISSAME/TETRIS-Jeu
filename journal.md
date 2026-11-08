@@ -182,3 +182,15 @@ Chaque partie peut afficher son score, son niveau et son état. Le joueur humain
 Le mode multijoueur n'est pas encore connecté à `main.js`. Cette partie sera réalisée à l'étape suivante.
 
 Résultat : 71 tests réussis sur 71. Le moteur du jeu n'a pas été modifié.
+
+### Exercice 4 — Étape 4 : fonctionnement du multijoueur
+
+J'ai utilisé Copilot Agent pour connecter le mode multijoueur au jeu.
+
+Copilot a modifié `main.js`, `renderer.js`, `index.html` et `styles.css`. Il a ajouté un choix entre le mode solo et 1 à 3 adversaires.
+
+Pendant les vérifications, Copilot a rencontré un problème avec les boutons qui étaient masqués en mode multijoueur. Il a corrigé ce problème.
+
+J'ai ensuite testé le jeu dans mon navigateur avec trois adversaires. Les quatre grilles s'affichent, les pièces descendent et les flèches contrôlent uniquement mon joueur. J'ai aussi vérifié que les boutons Pause et Reprendre fonctionnent.
+
+Résultat : 71 tests réussis sur 71. Aucune intelligence artificielle n'a encore été ajoutée.

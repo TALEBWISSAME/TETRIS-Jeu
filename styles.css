@@ -110,11 +110,72 @@ button {
     letter-spacing: 0.08em;
 }
 
+.mode-picker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin: -10px 0 25px;
+    color: #a4acc8;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.mode-picker select {
+    min-height: 38px;
+    padding: 7px 32px 7px 12px;
+    border: 1px solid rgba(60, 234, 255, 0.35);
+    border-radius: 8px;
+    background: #10162b;
+    color: #e7edff;
+    font: 500 0.78rem "Segoe UI", sans-serif;
+    letter-spacing: normal;
+    text-transform: none;
+    box-shadow: 0 0 14px rgba(60, 234, 255, 0.08);
+}
+
+.mode-picker select:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
+}
+
 .game-layout {
     display: grid;
     grid-template-columns: minmax(190px, 1fr) minmax(280px, 340px) minmax(190px, 1fr);
     align-items: center;
     gap: clamp(18px, 3vw, 36px);
+}
+
+.arcade--multiplayer .game-layout {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.arcade--multiplayer .stats-panel,
+.arcade--multiplayer .board-shell,
+.arcade--multiplayer .next-panel > .panel-heading,
+.arcade--multiplayer .preview-card {
+    display: none;
+}
+
+.arcade--multiplayer .next-panel {
+    width: min(100%, 380px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    gap: 10px;
+}
+
+.arcade--multiplayer .action-buttons {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+}
+
+.arcade--multiplayer .status-note {
+    grid-column: 1 / -1;
 }
 
 .side-panel {
@@ -448,6 +509,11 @@ button {
     color: #ff8cde;
 }
 
+.multiplayer-card__status--paused {
+    border-color: color-mix(in srgb, var(--violet) 45%, transparent);
+    color: #c6a9ff;
+}
+
 .multiplayer-card__board-frame {
     position: relative;
     overflow: hidden;
@@ -601,6 +667,17 @@ button {
 
     .subtitle {
         font-size: 0.76rem;
+    }
+
+    .mode-picker {
+        flex-direction: column;
+        gap: 7px;
+        margin: -8px 0 18px;
+        font-size: 0.58rem;
+    }
+
+    .mode-picker select {
+        width: min(100%, 260px);
     }
 
     .game-layout {
