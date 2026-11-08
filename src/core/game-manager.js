@@ -1,11 +1,22 @@
 import { GameInstance } from "./game-instance.js";
 import { createSeededRandom } from "./game.js";
 
+/** Nombre maximal d'adversaires dans une partie. */
 export const MAX_OPPONENTS = 3;
+/** Valeurs acceptées pour le niveau de difficulté des adversaires. */
 export const AI_DIFFICULTIES = ["beginner", "intermediate", "expert"];
 
-/** Organise la partie humaine et ses adversaires sans partager leur état de jeu. */
+/**
+ * Crée le joueur humain et jusqu'à trois adversaires avec des parties indépendantes.
+ */
 export class GameManager {
+    /**
+     * Initialise les joueurs et leurs instances de jeu.
+     * @param {object} [options] Nombre d'adversaires, graine et difficulté.
+     * @param {number} [options.opponents=0] Nombre d'adversaires, de 0 à 3.
+     * @param {number} [options.seed=0] Graine de base servant à créer les parties et les tirages IA.
+     * @param {"beginner"|"intermediate"|"expert"} [options.difficulty="beginner"] Difficulté attribuée aux adversaires.
+     */
     constructor({ opponents = 0, seed = 0, difficulty = "beginner" } = {}) {
         if (!Number.isInteger(opponents) || opponents < 0 || opponents > MAX_OPPONENTS) {
             throw new RangeError("Le nombre d'adversaires doit être compris entre 0 et 3.");
@@ -32,14 +43,17 @@ export class GameManager {
         });
     }
 
+    /** @returns {object} Joueur humain, toujours placé en première position. */
     get humanPlayer() {
         return this.players[this.humanPlayerIndex];
     }
 
+    /** @returns {object[]} Joueurs adverses, sans le joueur humain. */
     get opponents() {
         return this.players.filter(player => player.role === "opponent");
     }
 
+    /** @returns {GameInstance[]} Instances de jeu dans l'ordre des joueurs. */
     get games() {
         return this.players.map(player => player.game);
     }

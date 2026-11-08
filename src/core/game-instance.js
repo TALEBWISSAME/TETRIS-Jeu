@@ -7,71 +7,106 @@ import {
 } from "./game.js";
 import { canPlacePiece } from "./grid.js";
 
-/** Représente une partie indépendante en s'appuyant sur le moteur de jeu existant. */
+/**
+ * Partie indépendante qui délègue ses règles au moteur de jeu.
+ */
 export class GameInstance {
+    /**
+     * Crée un nouvel état de partie avec sa propre grille et son générateur aléatoire.
+     * @param {object} [options] Graine et générateur aléatoire facultatif.
+     * @param {number} [options.seed=0] Graine du générateur aléatoire par défaut.
+     * @param {() => number} [options.random] Générateur aléatoire injecté, s'il est fourni.
+     */
     constructor({ seed = 0, random } = {}) {
         this.state = random === undefined
             ? createGame({ seed })
             : createGame({ seed, random });
     }
 
+    /** @returns {number[][]} Grille actuelle de la partie. */
     get grid() {
         return this.state.grid;
     }
 
+    /** @returns {object|null} Pièce active, ou null si la partie est terminée. */
     get currentPiece() {
         return this.state.currentPiece;
     }
 
+    /** @returns {string|null} Type de la prochaine pièce connue. */
     get nextPieceType() {
         return this.state.nextPieceType;
     }
 
+    /** @returns {number} Score actuel. */
     get score() {
         return this.state.score;
     }
 
+    /** @returns {number} Nombre total de lignes supprimées. */
     get linesCleared() {
         return this.state.linesCleared;
     }
 
+    /** @returns {number} Niveau actuel. */
     get level() {
         return this.state.level;
     }
 
+    /** @returns {number} Délai de descente automatique en millisecondes. */
     get dropIntervalMs() {
         return this.state.dropIntervalMs;
     }
 
+    /** @returns {"playing"|"gameover"} Statut actuel de la partie. */
     get status() {
         return this.state.status;
     }
 
-    /** Déplace la pièce active d'une case à gauche ou à droite. */
+    /**
+     * Déplace la pièce active d'une case à gauche ou à droite si le déplacement est légal.
+     * @param {-1|1} direction -1 pour la gauche ou 1 pour la droite.
+     * @returns {GameInstance} Cette instance pour permettre l'enchaînement des appels.
+     */
     move(direction) {
         movePiece(this.state, direction);
         return this;
     }
 
-    /** Tourne la pièce active d'un quart de tour horaire si le placement est possible. */
+    /**
+     * Tourne la pièce active d'un quart de tour horaire si le placement est possible.
+     * @returns {GameInstance} Cette instance.
+     */
     rotate() {
         rotatePiece(this.state);
         return this;
     }
 
-    /** Fait descendre la pièce d'une case avec la descente accélérée. */
+    /**
+     * Fait descendre la pièce d'une case avec la descente accélérée.
+     * @returns {GameInstance} Cette instance.
+     */
     softDrop() {
         softDrop(this.state);
         return this;
     }
 
-    /** Effectue une étape de descente automatique. */
+    /**
+     * Effectue une étape de descente automatique.
+     * @returns {GameInstance} Cette instance.
+     */
     tick() {
         tick(this.state);
         return this;
     }
 
-    /** Verrouille un placement final légal en laissant le moteur appliquer les règles. */
+    /**
+     * Applique une position finale légale et laisse le moteur verrouiller la pièce.
+     * Le moteur gère ensuite les lignes, le score, le niveau et la pièce suivante.
+     * @param {{matrix: number[][], x: number, y: number}} placement Position finale à appliquer.
+     * @returns {GameInstance} Cette instance.
+     * @throws {Error} Si le placement ne correspond pas à une position finale légale.
+     */
     playPlacement(placement) {
         if (this.state.status !== "playing") {
             return this;

@@ -1,5 +1,9 @@
 
-// Les 7 tétrominos (I, O, T, S, Z, J, L) : matrices dans l'orientation 0
+/**
+ * Matrices de départ des sept tétrominos classiques (I, O, T, S, Z, J et L).
+ * Les cases valent 1 lorsqu'elles sont occupées et 0 lorsqu'elles sont vides.
+ * @type {Record<string, number[][]>}
+ */
 export const PIECES = {
     I: [
         [0, 0, 0, 0],
@@ -40,7 +44,12 @@ export const PIECES = {
 };
 
 
-/** Fait tourner une matrice carrée d'un quart de tour horaire. */
+/**
+ * Fait tourner une matrice carrée d'un quart de tour horaire.
+ * @param {number[][]} matrix Matrice carrée à tourner.
+ * @returns {number[][]} Nouvelle matrice tournée; la matrice reçue n'est pas modifiée.
+ * @throws {Error} Si la matrice n'est pas carrée.
+ */
 export function rotate(matrix) {
     const N = matrix.length;
     if (!matrix.every(row => Array.isArray(row) && row.length === N)) {
@@ -55,7 +64,6 @@ export function rotate(matrix) {
     }
     return result;
 }
-
 
 
 

@@ -18,6 +18,12 @@ function gridsEqual(first, second) {
 /**
  * Synchronise les couleurs d'une pièce verrouillée avec la grille issue du moteur.
  * Les lignes retirées sont retournées sous forme d'instantanés pour l'animation.
+ * @param {number[][]} previousGrid Grille binaire avant le verrouillage.
+ * @param {(string|null)[][]} lockedColors Couleurs associées aux cases déjà occupées.
+ * @param {{type: string, matrix: number[][], x: number, y: number}} piece Pièce qui vient d'être verrouillée.
+ * @param {number[][]} nextGrid Grille binaire obtenue après le verrouillage et la suppression des lignes.
+ * @returns {{lockedColors: (string|null)[][], removedRows: (string|null)[][]}} Couleurs synchronisées et lignes effacées.
+ * @throws {Error} Si les dimensions, le verrouillage ou la correspondance des grilles sont invalides.
  */
 export function applyLockedPiece(previousGrid, lockedColors, piece, nextGrid) {
     if (!isValidGrid(previousGrid) || !isValidGrid(nextGrid)) {

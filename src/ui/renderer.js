@@ -218,7 +218,19 @@ function createStatistic(container, label) {
     return value;
 }
 
-/** Crée un rendu Canvas qui affiche l'état reçu sans le modifier. */
+/**
+ * Crée une fonction qui dessine l'état du jeu sur les Canvas du mode solo.
+ * Le rendu lit l'état reçu sans le modifier.
+ * @param {object} options Éléments HTML affichant le plateau, l'aperçu et les statistiques.
+ * @param {HTMLCanvasElement} options.boardCanvas Canvas du plateau.
+ * @param {HTMLCanvasElement} options.nextCanvas Canvas de la pièce suivante.
+ * @param {HTMLElement} options.scoreElement Élément qui affiche le score.
+ * @param {HTMLElement} options.levelElement Élément qui affiche le niveau.
+ * @param {HTMLElement} options.linesElement Élément qui affiche les lignes supprimées.
+ * @param {HTMLElement} options.gameOverElement Élément du message de fin de partie.
+ * @returns {(game: object, options?: {lockedColors?: (string|null)[][], lineClear?: object}) => void}
+ * Fonction qui dessine l'état et les couleurs verrouillées facultatives.
+ */
 export function createRenderer({
     boardCanvas,
     nextCanvas,
@@ -260,7 +272,13 @@ export function createRenderer({
     };
 }
 
-/** Prépare l'affichage d'une à quatre parties dans une grille de joueurs. */
+/**
+ * Prépare le rendu d'une à quatre parties dans une grille de joueurs.
+ * @param {object} options Options du rendu.
+ * @param {HTMLElement} options.container Conteneur qui contient l'élément .multiplayer-grid.
+ * @returns {{renderPlayers: (players: object[]) => void, showSolo: () => void}}
+ * Méthodes pour afficher les parties ou masquer l'arène en mode solo.
+ */
 export function createMultiplayerRenderer({ container }) {
     requireElement(container, "container");
     const grid = container.querySelector(".multiplayer-grid");

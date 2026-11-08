@@ -1,7 +1,10 @@
 export const GRID_WIDTH = 10;
 export const GRID_HEIGHT = 20;
 
-/** Crée une grille vide de 10 colonnes et 20 lignes. */
+/**
+ * Crée une grille vide de 10 colonnes et 20 lignes.
+ * @returns {number[][]} Grille indépendante composée de cases initialisées à 0.
+ */
 export function createGrid() {
     return Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(0));
 }
@@ -40,7 +43,14 @@ function validatePosition(x, y) {
     }
 }
 
-/** Indique si une pièce peut être placée sans sortir de la grille ni chevaucher une case occupée. */
+/**
+ * Vérifie qu'une pièce ne dépasse pas la grille et ne chevauche aucune case occupée.
+ * @param {number[][]} grid Grille binaire de 10 colonnes et 20 lignes.
+ * @param {number[][]} piece Matrice carrée binaire de la pièce.
+ * @param {number} x Coordonnée horizontale de la matrice dans la grille.
+ * @param {number} y Coordonnée verticale de la matrice dans la grille.
+ * @returns {boolean} Vrai si toutes les cases occupées de la pièce peuvent être placées.
+ */
 export function canPlacePiece(grid, piece, x, y) {
     validateGrid(grid);
     validatePiece(piece);
@@ -69,7 +79,14 @@ export function canPlacePiece(grid, piece, x, y) {
     return true;
 }
 
-/** Retourne une nouvelle grille avec la pièce verrouillée à la position indiquée. */
+/**
+ * Retourne une copie de la grille où les cases occupées de la pièce sont verrouillées.
+ * @param {number[][]} grid Grille binaire de départ.
+ * @param {number[][]} piece Matrice carrée binaire de la pièce.
+ * @param {number} x Coordonnée horizontale de la pièce.
+ * @param {number} y Coordonnée verticale de la pièce.
+ * @returns {number[][]} Nouvelle grille; la grille d'origine n'est pas modifiée.
+ */
 export function placePiece(grid, piece, x, y) {
     if (!canPlacePiece(grid, piece, x, y)) {
         throw new Error("La pièce ne peut pas être placée à cette position.");
@@ -86,7 +103,11 @@ export function placePiece(grid, piece, x, y) {
     return nextGrid;
 }
 
-/** Supprime les lignes complètes et retourne la nouvelle grille et leur nombre. */
+/**
+ * Supprime toutes les lignes complètes et ajoute autant de lignes vides en haut.
+ * @param {number[][]} grid Grille binaire à traiter.
+ * @returns {{grid: number[][], clearedRows: number}} Nouvelle grille et nombre de lignes supprimées.
+ */
 export function clearFullRows(grid) {
     validateGrid(grid);
 

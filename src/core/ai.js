@@ -48,7 +48,13 @@ function evaluatePlacement(grid, placement) {
         - maximumHeight * MAX_HEIGHT_PENALTY;
 }
 
-/** Calcule les caractéristiques du plateau et le score pondéré de l'IA Experte. */
+/**
+ * Calcule les caractéristiques du plateau et le score pondéré de l'IA Experte.
+ * @param {number[][]} grid Grille binaire à analyser.
+ * @param {number} [linesCleared=0] Lignes supprimées par le placement évalué.
+ * @returns {{aggregateHeight: number, linesCleared: number, holes: number, irregularity: number, score: number}}
+ * Hauteur cumulée, lignes supprimées, trous, irrégularité et score calculé.
+ */
 export function evaluateExpertFeatures(grid, linesCleared = 0) {
     let aggregateHeight = 0;
     let holes = 0;
@@ -85,7 +91,13 @@ export function evaluateExpertFeatures(grid, linesCleared = 0) {
     return { aggregateHeight, linesCleared, holes, irregularity, score };
 }
 
-/** Énumère les positions finales accessibles d'une pièce sans modifier la grille. */
+/**
+ * Énumère les positions finales légales d'une pièce, en ignorant les rotations identiques.
+ * La descente est simulée sans modifier la grille ni la matrice reçues.
+ * @param {number[][]} grid Grille binaire de 10 colonnes et 20 lignes.
+ * @param {number[][]} piece Matrice carrée binaire de la pièce.
+ * @returns {{rotation: number, matrix: number[][], x: number, y: number}[]} Placements finaux légaux.
+ */
 export function findLegalPlacements(grid, piece) {
     canPlacePiece(grid, piece, 0, 0);
 
@@ -121,7 +133,13 @@ export function findLegalPlacements(grid, piece) {
     return placements;
 }
 
-/** Choisit un placement légal au hasard avec un générateur injectable. */
+/**
+ * Choisit au hasard un placement parmi les placements légaux.
+ * @param {number[][]} grid Grille binaire de la partie.
+ * @param {number[][]} piece Matrice de la pièce à placer.
+ * @param {() => number} [random=Math.random] Générateur qui retourne une valeur entre 0 inclus et 1 exclu.
+ * @returns {{rotation: number, matrix: number[][], x: number, y: number}|null} Placement choisi, ou null si aucun n'existe.
+ */
 export function chooseBeginnerPlacement(grid, piece, random = Math.random) {
     if (typeof random !== "function") {
         throw new TypeError("Le générateur aléatoire doit être une fonction.");
@@ -139,7 +157,12 @@ export function chooseBeginnerPlacement(grid, piece, random = Math.random) {
     return placements[Math.floor(value * placements.length)];
 }
 
-/** Choisit le placement qui complète des lignes en limitant les trous et la hauteur. */
+/**
+ * Choisit le placement qui complète des lignes en limitant les trous et la hauteur.
+ * @param {number[][]} grid Grille binaire de la partie.
+ * @param {number[][]} piece Matrice de la pièce à placer.
+ * @returns {{rotation: number, matrix: number[][], x: number, y: number}|null} Meilleur placement, ou null si aucun n'existe.
+ */
 export function chooseIntermediatePlacement(grid, piece) {
     const placements = findLegalPlacements(grid, piece);
     let bestPlacement = null;
@@ -156,7 +179,13 @@ export function chooseIntermediatePlacement(grid, piece) {
     return bestPlacement;
 }
 
-/** Choisit le meilleur placement, avec une anticipation facultative d'un coup. */
+/**
+ * Choisit le placement qui obtient le meilleur score expert, avec une anticipation facultative.
+ * @param {number[][]} grid Grille binaire de la partie.
+ * @param {number[][]} piece Matrice de la pièce actuelle.
+ * @param {number[][]} [nextPiece] Matrice de la prochaine pièce si elle est connue.
+ * @returns {{rotation: number, matrix: number[][], x: number, y: number}|null} Meilleur placement, ou null si aucun n'existe.
+ */
 export function chooseExpertPlacement(grid, piece, nextPiece) {
     const placements = findLegalPlacements(grid, piece);
     let bestPlacement = null;

@@ -2,13 +2,20 @@ import { canPlacePiece, clearFullRows, createGrid, placePiece } from "./grid.js"
 import { PIECES, rotate } from "./piece.js";
 import { getLevel, getLineScore } from "./scoring.js";
 
+/** Intervalle de descente initial, en millisecondes. */
 export const INITIAL_DROP_INTERVAL_MS = 1000;
+/** Intervalle minimal de descente, en millisecondes. */
 export const MIN_DROP_INTERVAL_MS = 100;
+/** Réduction de l'intervalle de descente à chaque niveau, en millisecondes. */
 export const DROP_INTERVAL_STEP_MS = 100;
 
 const PIECE_TYPES = Object.keys(PIECES);
 
-/** Crée un générateur pseudo-aléatoire déterministe à partir d'une graine entière. */
+/**
+ * Crée un générateur pseudo-aléatoire déterministe à partir d'une graine entière.
+ * @param {number} seed Graine entière utilisée pour initialiser le générateur.
+ * @returns {() => number} Fonction qui produit un nombre compris entre 0 inclus et 1 exclu.
+ */
 export function createSeededRandom(seed) {
     if (!Number.isInteger(seed)) {
         throw new TypeError("La graine doit être un entier.");
@@ -24,7 +31,11 @@ export function createSeededRandom(seed) {
     };
 }
 
-/** Retourne l'intervalle de descente automatique correspondant au niveau. */
+/**
+ * Retourne l'intervalle de descente automatique correspondant au niveau.
+ * @param {number} level Niveau entier, à partir de 1.
+ * @returns {number} Délai en millisecondes, limité à la vitesse minimale.
+ */
 export function getDropInterval(level) {
     if (!Number.isInteger(level) || level < 1) {
         throw new RangeError("Le niveau doit être un entier supérieur ou égal à 1.");
@@ -95,7 +106,13 @@ function descend(game) {
     return game;
 }
 
-/** Crée une partie. Un générateur aléatoire peut être injecté; sinon, la graine est utilisée. */
+/**
+ * Crée une partie avec une grille vide et ses deux premières pièces.
+ * @param {object} [options] Options de création.
+ * @param {number} [options.seed=0] Graine entière du générateur par défaut.
+ * @param {() => number} [options.random] Générateur aléatoire injecté à la place du générateur seedable.
+ * @returns {object} État mutable de la partie, incluant la grille, les pièces, le score et le statut.
+ */
 export function createGame({ seed = 0, random = createSeededRandom(seed) } = {}) {
     if (typeof random !== "function") {
         throw new TypeError("Le générateur aléatoire doit être une fonction.");
@@ -120,7 +137,12 @@ export function createGame({ seed = 0, random = createSeededRandom(seed) } = {})
     return game;
 }
 
-/** Tente de déplacer la pièce active d'une case horizontalement. */
+/**
+ * Tente de déplacer la pièce active d'une case horizontalement.
+ * @param {object} game État de la partie à modifier.
+ * @param {-1|1} direction Direction du déplacement : -1 à gauche ou 1 à droite.
+ * @returns {object} Le même état de partie, modifié seulement si le déplacement est légal.
+ */
 export function movePiece(game, direction) {
     if (game.status !== "playing") {
         return game;
@@ -141,7 +163,11 @@ export function movePiece(game, direction) {
     return game;
 }
 
-/** Tente de tourner la pièce active d'un quart de tour horaire. */
+/**
+ * Tente de tourner la pièce active d'un quart de tour horaire.
+ * @param {object} game État de la partie à modifier.
+ * @returns {object} Le même état de partie, modifié seulement si la rotation est légale.
+ */
 export function rotatePiece(game) {
     if (game.status !== "playing") {
         return game;
@@ -155,12 +181,20 @@ export function rotatePiece(game) {
     return game;
 }
 
-/** Effectue une étape de descente automatique. */
+/**
+ * Effectue une étape de descente automatique et verrouille la pièce si elle ne peut plus descendre.
+ * @param {object} game État de la partie à modifier.
+ * @returns {object} Le même état de partie après l'étape de descente.
+ */
 export function tick(game) {
     return descend(game);
 }
 
-/** Accélère la descente d'une case et verrouille la pièce si elle ne peut plus descendre. */
+/**
+ * Accélère la descente d'une case et verrouille la pièce si elle ne peut plus descendre.
+ * @param {object} game État de la partie à modifier.
+ * @returns {object} Le même état de partie après la descente accélérée.
+ */
 export function softDrop(game) {
     return descend(game);
 }

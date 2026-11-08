@@ -289,3 +289,16 @@ Après cette correction, tous les tests passent.
 Résultat : 112 tests réussis sur 112 et 94,97 % de couverture des instructions.
 
 Les trois niveaux d'IA sont fonctionnels. Les simulations montrent que l'IA experte obtient de meilleurs résultats que l'IA débutante sur les graines testées.
+### Exercice 6 — Étape 1 : Documentation JSDoc
+
+J'ai utilisé Copilot Agent pour ajouter des commentaires JSDoc aux fonctions importantes de mon projet Tetris.
+
+J'ai d'abord demandé à Copilot d'identifier les fonctions publiques à documenter. Il a proposé un plan concernant les fichiers du moteur, de la grille, des pièces, du score, des IA et de l'interface.
+
+J'ai ensuite accepté l'ajout des commentaires JSDoc en français pour expliquer le rôle des fonctions, leurs paramètres et leurs valeurs de retour.
+
+Copilot a modifié 10 fichiers JavaScript, sans changer le fonctionnement du jeu.
+
+J'ai vérifié le résultat avec les tests et les contrôles de syntaxe.
+
+Résultat : 112 tests réussis sur 112. Seuls les commentaires ont été modifiés.
