@@ -161,3 +161,13 @@ Copilot a réutilisé le moteur existant pour représenter une partie indépenda
 Il a ajouté 6 tests pour vérifier l'indépendance des parties et la compatibilité avec le mode solo.
 
 Résultat : 58 tests réussis sur 58. Aucun autre fichier n'a été modifié.
+
+### Exercice 4 — Étape 2 : GameManager
+
+J'ai utilisé Copilot Agent pour créer `game-manager.js` et `game-manager.test.js`.
+
+Le gestionnaire permet de créer une partie solo ou avec 1 à 3 adversaires. Chaque partie possède son propre état et sa propre graine aléatoire.
+
+Copilot a ajouté 13 tests pour vérifier les différentes configurations, l'indépendance des parties et la reproductibilité.
+
+Résultat : 71 tests réussis sur 71. Aucun fichier existant n'a été modifié et aucune IA n'a été ajoutée.
