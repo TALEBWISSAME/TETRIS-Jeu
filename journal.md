@@ -330,3 +330,17 @@ Comme le projet ne possède pas de script npm pour démarrer un serveur, Copilot
 J'ai accepté cette proposition, car elle correspond au fonctionnement actuel du projet.
 
 Résultat : le fichier README.md a été créé sans modifier le code JavaScript ni les tests.
+
+### Exercice 6 — Étape 3 : Documentation de l'architecture
+
+J'ai demandé à Copilot Agent de créer un document pour expliquer l'architecture de mon projet Tetris.
+
+Copilot a d'abord analysé les fichiers du moteur, de l'interface et du mode multijoueur.
+
+Il a ensuite créé le fichier `docs/ARCHITECTURE.md` avec une présentation des modules et une explication du fonctionnement du jeu.
+
+Le document contient aussi deux diagrammes Mermaid : un pour montrer les relations entre les modules et un autre pour représenter les étapes d'un tour de jeu.
+
+Copilot a vérifié la structure des diagrammes et les modifications Git.
+
+Résultat : le document d'architecture a été créé sans modifier le code du jeu.
