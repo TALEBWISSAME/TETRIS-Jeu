@@ -206,3 +206,13 @@ Copilot a également vérifié les couleurs des pièces verrouillées et l'anima
 Résultat : 71 tests réussis sur 71 et 91,74 % de couverture des instructions.
 
 Aucun bug n'a été détecté pendant cette validation. Aucun fichier n'a été modifié et aucun test supplémentaire n'a été nécessaire.
+
+### Exercice 5 — Étape 1 : Placements possibles
+
+J'ai utilisé Copilot Agent pour créer `ai.js` et `ai.test.js`.
+
+Copilot a ajouté une fonction `findLegalPlacements` qui cherche les placements possibles d'une pièce. Elle vérifie les rotations, les positions horizontales et les collisions, puis simule la descente sans modifier la grille.
+
+Lors de la première exécution, un test a échoué à cause d'une valeur `-0`. Copilot a corrigé ce problème et relancé les tests.
+
+Résultat : 77 tests réussis sur 77, dont 6 nouveaux tests. Aucun autre fichier n'a été modifié.
