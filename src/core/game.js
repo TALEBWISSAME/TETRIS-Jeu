@@ -112,6 +112,7 @@ function descend(game) {
  * @param {number} [options.seed=0] Graine entière du générateur par défaut.
  * @param {() => number} [options.random] Générateur aléatoire injecté à la place du générateur seedable.
  * @returns {object} État mutable de la partie, incluant la grille, les pièces, le score et le statut.
+ * @throws {TypeError} Si la graine ou le générateur aléatoire est invalide.
  */
 export function createGame({ seed = 0, random = createSeededRandom(seed) } = {}) {
     if (typeof random !== "function") {
@@ -142,6 +143,7 @@ export function createGame({ seed = 0, random = createSeededRandom(seed) } = {})
  * @param {object} game État de la partie à modifier.
  * @param {-1|1} direction Direction du déplacement : -1 à gauche ou 1 à droite.
  * @returns {object} Le même état de partie, modifié seulement si le déplacement est légal.
+ * @throws {RangeError} Si la direction n'est pas -1 ou 1.
  */
 export function movePiece(game, direction) {
     if (game.status !== "playing") {

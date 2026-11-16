@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+    AIPlayer,
+    AI_MOVE_INTERVALS_MS,
     chooseBeginnerPlacement,
     chooseExpertPlacement,
     chooseIntermediatePlacement,
@@ -8,6 +10,7 @@ import {
 } from "../src/core/ai.js";
 import { canPlacePiece, createGrid, GRID_HEIGHT, GRID_WIDTH } from "../src/core/grid.js";
 import { createGame, createSeededRandom } from "../src/core/game.js";
+import { GameInstance } from "../src/core/game-instance.js";
 import { PIECES } from "../src/core/piece.js";
 
 describe("énumération des placements légaux", () => {
@@ -220,6 +223,7 @@ describe("IA Experte", () => {
             holes: 1,
             irregularity: 4,
         });
+
         expect(features.score).toBeCloseTo(-2.11);
     });
 
@@ -299,5 +303,58 @@ describe("IA Experte", () => {
         const blockedGrid = Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(1));
 
         expect(chooseExpertPlacement(blockedGrid, PIECES.T)).toBeNull();
+    });
+});
+
+describe("AIPlayer", () => {
+    it.each([
+        ["beginner", 300],
+        ["intermediate", 200],
+        ["expert", 100],
+    ])("associe le niveau %s au délai de %i ms", (difficulty, intervalMs) => {
+        const player = new AIPlayer({ difficulty, random: createSeededRandom(32) });
+
+        expect(player.moveIntervalMs).toBe(intervalMs);
+        expect(AI_MOVE_INTERVALS_MS[difficulty]).toBe(intervalMs);
+    });
+
+    it.each(["beginner", "intermediate", "expert"])(
+        "produit une décision légale et jouable pour le niveau %s",
+        difficulty => {
+            const instance = new GameInstance({ seed: 56 });
+            const player = new AIPlayer({
+                difficulty,
+                random: createSeededRandom(78),
+            });
+            const gridBefore = instance.grid.map(row => [...row]);
+            const pieceBefore = instance.currentPiece.matrix.map(row => [...row]);
+            const decision = player.decide(
+                instance.grid,
+                instance.currentPiece.matrix,
+                PIECES[instance.nextPieceType],
+            );
+
+            expect(decision).toEqual({
+                rotation: expect.any(Number),
+                colonne: expect.any(Number),
+            });
+            expect(instance.grid).toEqual(gridBefore);
+            expect(instance.currentPiece.matrix).toEqual(pieceBefore);
+
+            const placement = findLegalPlacements(
+                instance.grid,
+                instance.currentPiece.matrix,
+            ).find(candidate =>
+                candidate.rotation === decision.rotation
+                && candidate.x === decision.colonne
+            );
+            expect(placement).toBeDefined();
+            expect(instance.playPlacement(placement)).toBe(instance);
+        },
+    );
+
+    it("refuse un niveau inconnu et un générateur aléatoire invalide", () => {
+        expect(() => new AIPlayer({ difficulty: "impossible" })).toThrow(RangeError);
+        expect(() => new AIPlayer({ difficulty: "beginner", random: 1 })).toThrow(TypeError);
     });
 });

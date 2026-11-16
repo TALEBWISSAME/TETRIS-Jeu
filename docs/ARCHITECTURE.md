@@ -49,9 +49,10 @@ Ce dossier contient les éléments liés à l'interface :
 ### `main.js`
 
 `main.js` initialise les éléments de la page, crée le `GameManager` et les
-données nécessaires à l'affichage, puis relie le moteur, les IA et les modules
-de l'interface. Il gère les minuteries de descente, la pause, le redémarrage, le
-changement de mode et le choix de difficulté.
+données nécessaires à l'affichage, puis relie le moteur et les modules de
+l'interface. Le `GameManager` prend en charge les IA et les tours des
+adversaires. `main.js` gère les minuteries de descente, la pause, le
+redémarrage, le changement de mode et le choix de difficulté.
 
 ## Fonctionnement d'une partie solo
 
@@ -74,7 +75,8 @@ utilisent la difficulté sélectionnée dans l'interface; le générateur
 pseudo-aléatoire de l'IA Débutante est propre à chaque adversaire.
 
 À chaque échéance, `scheduleTick` dans `main.js` appelle
-`advanceOpponentTurn` avec le joueur et l'état de son tour. Pour chaque nouvelle
+`GameManager.advanceOpponent` avec le joueur et l'état de son tour. Le
+gestionnaire délègue ensuite à `advanceOpponentTurn`. Pour chaque nouvelle
 pièce, cette fonction choisit un placement avec la stratégie correspondant à sa
 difficulté :
 
@@ -167,13 +169,14 @@ classDiagram
     MainModule ..> GameManager : import direct
     MainModule ..> GameModule : import direct
     MainModule ..> GridModule : import direct
-    MainModule ..> OpponentTurnModule : import direct
     MainModule ..> InputModule : import direct
     MainModule ..> RendererModule : import direct
     MainModule ..> LockedColorsModule : import direct
 
     GameManager ..> GameInstance : import direct
     GameManager ..> GameModule : import direct
+    GameManager ..> AIModule : import direct
+    GameManager ..> OpponentTurnModule : import direct
     GameInstance ..> GameModule : import direct
     GameInstance ..> GridModule : import direct
     GameInstance ..> PieceModule : import direct
@@ -189,8 +192,7 @@ classDiagram
     LockedColorsModule ..> GridModule : import direct
     LockedColorsModule ..> PieceModule : import direct
 
-    MainModule ..> AIModule : appel indirect via advanceOpponentTurn
-    OpponentTurnModule ..> GameInstance : appel player.game.tick()
+    OpponentTurnModule ..> GameInstance : appel sur player.game
 ```
 
 ## Étapes principales d'un tour
@@ -198,6 +200,7 @@ classDiagram
 ```mermaid
 sequenceDiagram
     participant Main as main.js
+    participant Manager as GameManager
     participant Turn as advanceOpponentTurn()
     participant AI as src/core/ai.js
     participant Instance as player.game (GameInstance)
@@ -206,9 +209,10 @@ sequenceDiagram
     participant Colors as src/ui/locked-colors.js
     participant Renderer as src/ui/renderer.js
 
-    Main->>Main: scheduleTick() attend dropIntervalMs
+    Main->>Main: scheduleTick() attend l'intervalle du joueur
     Main->>Main: perform() démarre le tick de l'adversaire
-    Main->>Turn: advanceOpponentTurn(player, opponentTurn)
+    Main->>Manager: GameManager.advanceOpponent(player, opponentTurn)
+    Manager->>Turn: advanceOpponentTurn(player, opponentTurn)
     alt Nouvelle pièce active
         Turn->>AI: choose...Placement(grid, currentPiece.matrix, ...)
         AI-->>Turn: placement légal
@@ -216,7 +220,7 @@ sequenceDiagram
     else Placement déjà choisi pour cette pièce
         Turn->>Turn: conserve matrix et x
     end
-    Turn->>Instance: player.game.tick()
+    Turn->>Instance: player.game.rotate(), move() ou tick()
     Instance->>Engine: tick(state)
     Engine->>Grid: canPlacePiece(..., y + 1)
     Grid-->>Engine: placement possible ou bloqué

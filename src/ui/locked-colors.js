@@ -22,7 +22,7 @@ function gridsEqual(first, second) {
  * @param {(string|null)[][]} lockedColors Couleurs associées aux cases déjà occupées.
  * @param {{type: string, matrix: number[][], x: number, y: number}} piece Pièce qui vient d'être verrouillée.
  * @param {number[][]} nextGrid Grille binaire obtenue après le verrouillage et la suppression des lignes.
- * @returns {{lockedColors: (string|null)[][], removedRows: (string|null)[][]}} Couleurs synchronisées et lignes effacées.
+ * @returns {{lockedColors: (string|null)[][], removedRows: (string|null)[][], removedRowIndexes: number[]}} Couleurs synchronisées et lignes effacées avec leurs positions d'origine.
  * @throws {Error} Si les dimensions, le verrouillage ou la correspondance des grilles sont invalides.
  */
 export function applyLockedPiece(previousGrid, lockedColors, piece, nextGrid) {
@@ -92,5 +92,9 @@ export function applyLockedPiece(previousGrid, lockedColors, piece, nextGrid) {
         throw new Error("La grille des couleurs ne correspond pas à la grille du moteur.");
     }
 
-    return { lockedColors: synchronizedColors, removedRows };
+    return {
+        lockedColors: synchronizedColors,
+        removedRows,
+        removedRowIndexes: clearedRows,
+    };
 }

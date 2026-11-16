@@ -16,11 +16,7 @@ Pour les étapes 6 et 7, j'ai utilisé le mode Agent. Il a créé et exécuté l
 
 Le mode Agent effectue davantage d'opérations et peut consommer plus de requêtes premium que la simple complétion automatique.
 
-**Consommation réelle des étapes 6 et 7 :** à compléter après consultation des statistiques Copilot.
-
-**Consommation réelle des étapes 1 à 3 :** à compléter après consultation des statistiques Copilot.
-
-Les statistiques globales ne permettent pas toujours de retrouver précisément le coût de chaque étape. Si les valeurs ne sont pas disponibles, je le préciserai plutôt que de donner des chiffres approximatifs.
+Je ne peux pas donner les nombres de crédits consommés à partir du dépôt : ni le journal ni l'historique Git ne contiennent les statistiques de consommation de Copilot. Il faut relever manuellement, sur la page des paramètres Copilot de GitHub, le coût des étapes 6 et 7, puis celui des étapes 1 à 3. Je ne peux pas déduire ces chiffres du nombre de commits ou de requêtes.
 
 ### Question C — Quel outil choisir pour chaque besoin ?
 
@@ -36,25 +32,21 @@ Les statistiques globales ne permettent pas toujours de retrouver précisément 
 
 ## Exercice 2 — Développement du Tetris avec Copilot Agent
 
-### Question 1 — Quelles itérations ont été nécessaires ?
+### Question A — Combien de requêtes agent et d'interventions manuelles ? Quelle étape a été reprise, et avec quelle information ?
 
-J'ai commencé par demander à Copilot de préparer un plan à partir de la spécification. Sa première proposition ne respectait pas tous les noms de fichiers demandés et oubliait `grid.js`. Je lui ai demandé de corriger son plan, puis j'ai validé la deuxième proposition.
+Le journal consigne cinq étapes de réalisation, chacune avec une demande à l'Agent. Il consigne aussi des demandes de correction pendant l'étape du moteur et pendant la dernière étape. Il ne donne toutefois pas le nombre exact de requêtes Agent ni le décompte complet des interventions manuelles. Les commits ne permettent pas de les compter : un commit ne correspond pas nécessairement à une seule requête.
 
-Ensuite, j'ai développé le jeu en cinq étapes. Pendant l'étape du moteur, Copilot a dû corriger certains tests qui ne passaient pas.
+Les interventions manuelles explicitement décrites sont notamment la correction du plan après sa première proposition, le choix du style arcade, la demande d'ajout d'identifiants aux boutons et la demande de correction des couleurs et de l'animation.
 
-Pour l'interface, j'ai choisi un design arcade néon. J'ai aussi demandé à Copilot d'ajouter des identifiants aux boutons.
+L'étape du moteur a été reprise après que le premier lancement des tests a signalé trois problèmes dans des scénarios. Le journal ne conserve ni les noms de ces tests ni le texte exact de la sortie du terminal. Il faut renseigner manuellement le nombre total de requêtes et d'interventions, ainsi que ces détails de diagnostic, s'ils sont encore disponibles.
 
-Enfin, pendant la dernière étape, j'ai demandé une correction pour mieux gérer les couleurs des pièces verrouillées et l'animation des lignes supprimées. Copilot a fait plusieurs modifications avant d'obtenir 44 tests réussis.
+### Question B — Quelle violation de `copilot-instructions.md` se trouvait dans le code produit ? Comment la faire corriger sans répéter la consigne ?
 
-### Question 2 — Copilot a-t-il respecté toutes les instructions ?
+Les éléments conservés ne permettent pas d'identifier une violation précise dans le code produit. La première proposition de plan utilisait des noms de fichiers différents et omettait `grid.js`, mais c'était une erreur du plan, pas une violation démontrée dans le code. Dans les fichiers de l'exercice 2, les commentaires examinés sont en français et `src/core/` reste séparé du DOM et du Canvas.
 
-Pas complètement dès le début. Dans sa première proposition de plan, Copilot avait utilisé des noms de fichiers différents de ceux demandés et avait oublié `grid.js`.
+Je ne peux donc pas présenter cette erreur de plan comme la violation de code demandée. Pour corriger une violation constatée sans recopier la consigne, je peux donner à l'Agent le fichier et l'écart précis, puis lui demander de relire `#file:.github/copilot-instructions.md` et de corriger uniquement cet écart.
 
-J'ai donc dû lui rappeler les contraintes du TP.
-
-Pendant le développement, j'ai également demandé des corrections pour améliorer le fonctionnement du jeu. Copilot a ensuite respecté l'architecture prévue, sans modifier inutilement le moteur.
-
-### Question 3 — Pourquoi travailler en plusieurs étapes plutôt qu'avec un seul grand prompt ?
+### Question C — L'étape 2 aurait-elle été possible en un seul prompt ? Qu'aurait-on perdu ?
 
 Je trouve que travailler en plusieurs étapes est plus pratique, car je peux vérifier le résultat après chaque modification.
 
@@ -66,34 +58,30 @@ Cette méthode m'a aussi permis de faire des tests et des commits régulièremen
 
 ## Exercice 3 — Tests et couverture
 
-### 1. Comment les tests ont-ils été réalisés ?
+### Question A — Quel test généré ne vérifiait rien d'utile ? Comment l'ai-je réécrit ?
 
-J'ai d'abord utilisé Copilot Agent pour compléter les tests de la grille et du score. Ensuite, j'ai utilisé la complétion automatique de Copilot pour écrire moi-même trois tests : les quatre orientations de la pièce T, une collision contre un bord et une collision avec une pièce déjà posée.
+Je ne peux pas identifier dans les éléments conservés un test qui a réellement été jugé inutile puis réécrit. Le journal rapporte un test incorrect pour la collision contre le bord, mais il a été corrigé pour tester que `canPlacePiece` renvoie `false`; ce n'est pas le test inutile décrit dans la question.
 
-Copilot m'a proposé un test incorrect pour la collision contre le bord. J'ai dû corriger la taille de la grille et remplacer `toThrow()` par `toBe(false)`.
+Le test de reproductibilité de `game.test.js` compare deux séquences générées avec la même graine. Il vérifie une propriété utile, même s'il ne fixe pas une séquence de référence. Je ne peux pas le présenter comme une tautologie ni prétendre l'avoir réécrit. Il faut retrouver le test concerné et son diff dans mes notes ou le compléter manuellement; faute de cette preuve, cette question reste incomplète.
 
-### 2. Quel résultat ai-je obtenu pour les tests et la couverture ?
+### Question B — L'agent a-t-il corrigé le code ou aligné le test sur le bug ? Comment éviter qu'il modifie le test ?
 
-J'ai obtenu 52 tests réussis sur 52. Avec `npm run coverage`, j'ai obtenu 93,79 % de couverture des lignes dans `src/core`, ce qui dépasse les 80 % demandés.
+J'ai volontairement changé `scoring.js` pour que trois lignes rapportent 300 points au lieu des 500 attendus. Le test a échoué. D'après le journal, Copilot a remis la bonne valeur dans le code de `scoring.js`, sans modifier les tests; les 52 tests ont ensuite réussi.
 
-### 3. Comment Copilot a-t-il corrigé le bug volontaire ?
+Pour éviter que l'Agent corrige le test à la place du code, je peux préciser : « Corrige le bug dans `src/core/scoring.js` selon la spécification. Ne modifie aucun fichier de test. Utilise la sortie de `npm test` pour vérifier la correction, puis indique les fichiers modifiés. »
 
-J'ai modifié `scoring.js` pour que trois lignes supprimées rapportent 300 points au lieu de 500. Après avoir lancé les tests, un test a échoué.
+### Question C — Qu'est-ce qui n'est pas couvert dans `src/core`, et pourquoi ?
 
-J'ai transmis cette erreur à Copilot Agent. Il a retrouvé la mauvaise valeur et l'a corrigée dans `scoring.js`, sans modifier les tests. Après sa correction, les 52 tests ont réussi.
+J'ai relancé la couverture sur l'archive Git `ex3`, qui contient les 52 tests de l'exercice. Elle donne **93,79 % de couverture des lignes de `src/core`**. Le rapport identifie dans `game.js` des branches non exécutées : les validations d'une graine invalide (ligne 14), d'un niveau invalide (30), d'une valeur aléatoire invalide (41), d'un générateur invalide (101) et d'une direction invalide (129). Il laisse aussi non testés certains retours sans effet lorsque la partie est déjà terminée (lignes 86, 126 et 147).
+
+Ces lignes correspondent surtout à des cas d'erreur ou à des appels après la fin de partie, et non à du code mort. Les tests injectent un générateur déterministe pour vérifier la reproductibilité, mais ne couvrent pas toutes les valeurs invalides possibles. Le journal ne détaille pas ces lignes; elles ont été identifiées en relançant la couverture sur le tag `ex3`.
 ## Exercice 4 — Mode versus
 
 ### Question A — Quelles fonctions le refactoring a-t-il déplacées ou renommées ? Un test a-t-il échoué pendant l'opération ? Lequel, et qu'a fait l'agent ?
 
-Pour ajouter le multijoueur, nous avons créé les classes `GameInstance` et `GameManager`.
+La comparaison des tags `ex3` et `ex4` montre que les fonctions du moteur dans `src/core/game.js` n'ont pas été déplacées ni renommées. `GameInstance` a été ajouté comme interface de partie : ses méthodes `move`, `rotate`, `softDrop` et `tick` délèguent aux fonctions existantes du moteur. Le démarrage de partie, auparavant fait directement dans `main.js` avec `createGame`, est maintenant organisé par `GameManager` et ses `GameInstance`.
 
-`GameInstance` permet de gérer une partie avec sa propre grille, sa pièce courante et son score. `GameManager` permet de gérer plusieurs parties en même temps et de déterminer le gagnant.
-
-Nous avons aussi adapté `main.js` pour gérer le choix du mode solo ou multijoueur.
-
-Après les différentes étapes, les tests étaient tous réussis. Ils sont passés de 52 à 71 tests. Cela nous a permis de vérifier que le mode solo fonctionnait toujours.
-
-*À compléter avec le journal si un test a échoué pendant une étape intermédiaire, car le bilan final ne permet pas de le savoir.*
+Le journal ne rapporte pas d'échec de test pendant le refactoring. Il décrit plutôt un problème d'interface : les boutons étaient masqués en mode multijoueur, puis l'Agent a corrigé leur affichage. Les tests consignés sont passés de 52 à 71. Je ne peux donc pas nommer de test échoué ni affirmer qu'un échec de test a guidé cette correction.
 
 ### Question B — Comparer `git diff ex3 ex4 --stat` avec ce que vous auriez modifié à la main : l'agent a-t-il touché des fichiers inutiles ?
 
@@ -149,26 +137,20 @@ Seule la documentation a été modifiée, sans changer le code du jeu ni les tes
 
 ### Question B — Vérification des dépendances du diagramme
 
-J'ai demandé à Copilot de comparer les diagrammes de `docs/ARCHITECTURE.md` avec les imports des fichiers JavaScript.
+J'ai comparé les imports actuels avec le diagramme. `main.js` importe directement `game.js`, `grid.js`, `game-manager.js` et les modules de l'interface. Il n'importe pas directement `ai.js` ni `opponent-turn.js`.
 
-Il a trouvé des dépendances manquantes, notamment entre `main.js` et `grid.js`, ainsi qu'entre `game-instance.js` et `grid.js` et `piece.js`.
+En revanche, `game-manager.js` importe `game-instance.js`, `game.js`, `ai.js` et `opponent-turn.js`. Le module `ai.js` importe `grid.js` et `piece.js`, tandis que `opponent-turn.js` importe `ai.js` et `piece.js`.
 
-Il a aussi trouvé un lien entre `main.js` et `ai.js` qui ne correspond pas à un import direct. En réalité, `main.js` utilise `opponent-turn.js`, qui importe les fonctions de l'IA.
+Le diagramme doit donc représenter `main.js → game-manager.js`, puis `game-manager.js → ai.js` et `game-manager.js → opponent-turn.js`. Les liens directs `main.js → opponent-turn.js` et `main.js → ai.js` sont incorrects dans l'organisation actuelle. Ils correspondaient à une organisation historique où `main.js` appelait directement `advanceOpponentTurn`.
 
-Cette vérification m'a permis de voir que le diagramme ne représentait pas exactement toutes les dépendances du code.
-
-J'ai également constaté que le document contenait deux flowcharts au lieu du diagramme de classes et du diagramme de séquence demandés.
+Cette vérification m'a aussi montré que le diagramme doit distinguer les imports directs des appels indirects. Le document contient par ailleurs un diagramme de classes et un diagramme de séquence Mermaid, conformément à la structure demandée.
 
 ### Question C — Vérification des remarques de la revue de code
 
-J'ai demandé à Copilot de vérifier les remarques de sa revue de code.
+La première remarque concernait les adversaires IA qui plaçaient leurs pièces directement. Elle a été confirmée par le code, puis corrigée avec Copilot dans le commit de correction de la vitesse des IA. Des tests vérifient ensuite la descente progressive et le verrouillage des pièces.
 
-Aucune des trois remarques ne s'est révélée fausse.
+La deuxième remarque concernait `GameInstance.playPlacement()`, qui pouvait accepter une matrice différente de la pièce active. Le problème a été reproduit avec une matrice `[[1]]`, puis corrigé avec Copilot. Des tests vérifient qu'une matrice incorrecte est refusée et qu'une rotation valide reste acceptée.
 
-Le premier problème concernait les adversaires IA qui plaçaient leurs pièces directement. Le deuxième concernait la méthode `playPlacement()`, qui acceptait une matrice incorrecte.
+La troisième remarque concernait l'animation des lignes supprimées. Le code contient bien un mécanisme d'animation, mais je n'ai ni test de rendu ni vérification visuelle permettant de confirmer précisément le problème ou sa correction. Je ne peux donc pas dire que cette remarque était fausse.
 
-Ces deux problèmes ont été vérifiés avec des tests, puis corrigés.
-
-Le troisième concernait l'animation des lignes supprimées. Le problème semble réel en lisant le code, mais nous ne l'avons pas vérifié visuellement.
-
-Cette vérification m'a montré qu'il ne faut pas accepter automatiquement les remarques de Copilot : il faut les comparer au code et aux tests.
+Le journal et les commits attribuent explicitement les deux premières corrections à Copilot. Je ne trouve pas de preuve indiquant quelles corrections auraient ensuite été réalisées avec Codex ; je ne les attribue donc pas à Codex.

@@ -1,7 +1,6 @@
 import { movePiece, rotatePiece, softDrop, tick } from "./src/core/game.js";
 import { GRID_HEIGHT, GRID_WIDTH } from "./src/core/grid.js";
 import { GameManager } from "./src/core/game-manager.js";
-import { advanceOpponentTurn } from "./src/core/opponent-turn.js";
 import { bindInput } from "./src/ui/input.js";
 import { applyLockedPiece } from "./src/ui/locked-colors.js";
 import { createMultiplayerRenderer, createRenderer } from "./src/ui/renderer.js";
@@ -68,6 +67,7 @@ function drawRuntime(runtime) {
     const lineClear = runtime.lineClearAnimation
         ? {
             rows: runtime.lineClearAnimation.rows,
+            rowIndexes: runtime.lineClearAnimation.rowIndexes,
             progress: Math.min(
                 (performance.now() - runtime.lineClearAnimation.startedAt)
                     / runtime.lineClearAnimation.duration,
@@ -95,7 +95,11 @@ function draw() {
                     ),
                 }
                 : undefined,
-        })));
+        })), {
+            winner: manager.winner,
+            podium: manager.podium,
+            isFinished: manager.isFinished,
+        });
     } else {
         multiplayerRenderer.showSolo();
         drawRuntime(runtimes[0]);
@@ -121,6 +125,7 @@ function syncLockedColors(runtime, previousGrid, piece, nextGrid) {
     if (result.removedRows.length > 0) {
         const animation = {
             rows: result.removedRows,
+            rowIndexes: result.removedRowIndexes,
             startedAt: performance.now(),
             duration: 360,
         };
@@ -140,6 +145,17 @@ function perform(runtime, action) {
     if (previousPiece && runtime.game.grid !== previousGrid) {
         syncLockedColors(runtime, previousGrid, previousPiece, runtime.game.grid);
     }
+    if (modeIsMultiplayer) {
+        manager.updateResults();
+        if (manager.isFinished) {
+            for (const item of runtimes) {
+                item.isRunning = false;
+                item.isPaused = false;
+                clearTimer(item);
+            }
+            updatePauseLabel();
+        }
+    }
     draw();
 }
 
@@ -152,21 +168,28 @@ function clearTimer(runtime) {
 
 function scheduleTick(runtime) {
     clearTimer(runtime);
-    if (!runtime.isRunning || runtime.isPaused || runtime.game.status !== "playing") {
+    if (
+        !runtime.isRunning
+        || runtime.isPaused
+        || runtime.game.status !== "playing"
+        || (modeIsMultiplayer && manager.isFinished)
+    ) {
         return;
     }
 
+    const intervalMs = runtime.player.aiPlayer?.moveIntervalMs
+        ?? runtime.game.dropIntervalMs;
     runtime.timerId = setTimeout(() => {
         runtime.timerId = null;
         perform(runtime, item => {
             if (runtime.player.role === "human") {
                 tick(item.game);
             } else {
-                advanceOpponentTurn(runtime.player, runtime.opponentTurn);
+                manager.advanceOpponent(runtime.player, runtime.opponentTurn);
             }
         });
         scheduleTick(runtime);
-    }, runtime.game.dropIntervalMs);
+    }, intervalMs);
 }
 
 function scheduleAllTicks() {
@@ -174,6 +197,12 @@ function scheduleAllTicks() {
 }
 
 function updatePauseLabel() {
+    if (modeIsMultiplayer && manager.isFinished) {
+        pauseButton.textContent = "Terminé";
+        pauseButton.disabled = true;
+        return;
+    }
+    pauseButton.disabled = false;
     const activeGames = runtimes.filter(runtime =>
         runtime.isRunning && runtime.game.status === "playing"
     );
@@ -184,6 +213,9 @@ function updatePauseLabel() {
 }
 
 function startGame() {
+    if (modeIsMultiplayer && manager.isFinished) {
+        return;
+    }
     for (const runtime of runtimes) {
         if (runtime.game.status === "playing") {
             runtime.isRunning = true;

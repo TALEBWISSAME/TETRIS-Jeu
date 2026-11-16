@@ -50,6 +50,7 @@ function validatePosition(x, y) {
  * @param {number} x Coordonnée horizontale de la matrice dans la grille.
  * @param {number} y Coordonnée verticale de la matrice dans la grille.
  * @returns {boolean} Vrai si toutes les cases occupées de la pièce peuvent être placées.
+ * @throws {Error} Si la grille, la pièce ou les coordonnées sont invalides.
  */
 export function canPlacePiece(grid, piece, x, y) {
     validateGrid(grid);
@@ -86,6 +87,7 @@ export function canPlacePiece(grid, piece, x, y) {
  * @param {number} x Coordonnée horizontale de la pièce.
  * @param {number} y Coordonnée verticale de la pièce.
  * @returns {number[][]} Nouvelle grille; la grille d'origine n'est pas modifiée.
+ * @throws {Error} Si la grille, la pièce ou la position est invalide.
  */
 export function placePiece(grid, piece, x, y) {
     if (!canPlacePiece(grid, piece, x, y)) {
@@ -107,6 +109,7 @@ export function placePiece(grid, piece, x, y) {
  * Supprime toutes les lignes complètes et ajoute autant de lignes vides en haut.
  * @param {number[][]} grid Grille binaire à traiter.
  * @returns {{grid: number[][], clearedRows: number}} Nouvelle grille et nombre de lignes supprimées.
+ * @throws {Error} Si la grille n'a pas les dimensions ou les valeurs attendues.
  */
 export function clearFullRows(grid) {
     validateGrid(grid);

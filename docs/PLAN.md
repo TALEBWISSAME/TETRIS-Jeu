@@ -25,7 +25,7 @@ Voici le plan corrigé en **exactement cinq étapes**, en respectant les fichier
    **Tests :** exécuter les tests automatisés du cœur pour vérifier que le rendu ne modifie pas les règles; compléter par une vérification manuelle dans le navigateur, sans ajouter de dépendance de test UI.
 
 5. **Relier les commandes et finaliser le cycle de jeu**  
-   **Fichiers :** `src/ui/input.js`, `main.js`, `src/ui/renderer.js`, `tests/input.test.js`.  
+   **Fichiers :** `src/ui/input.js`, `main.js`, `src/ui/renderer.js`, `src/ui/locked-colors.js`, `index.html`, `tests/locked-colors.test.js`.
    **Fonctionnalités :** initialiser et relier le moteur au rendu; associer les flèches aux mouvements et à la rotation, P à la pause/reprise, et connecter les boutons Démarrer, Pause et Recommencer. Déclencher la descente automatique et l’animation de suppression des lignes.  
    **Vérifications manuelles :** parcourir une partie complète, tester chaque touche et bouton, observer pause/reprise, redémarrage, accélération de la descente et fin de partie.  
-   **Tests :** vérifier la correspondance des commandes avec les actions attendues, puis lancer `npm test` pour toute la suite.
+   **Tests :** vérifier manuellement la correspondance des commandes avec les actions attendues, puis lancer `npm test` pour toute la suite; aucun test automatisé dédié à `input.js` n'est présent.

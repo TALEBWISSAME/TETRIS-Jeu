@@ -40,6 +40,7 @@ export class GameInstance {
      * @param {object} [options] Graine et générateur aléatoire facultatif.
      * @param {number} [options.seed=0] Graine du générateur aléatoire par défaut.
      * @param {() => number} [options.random] Générateur aléatoire injecté, s'il est fourni.
+     * @throws {TypeError} Si la graine ou le générateur aléatoire est invalide.
      */
     constructor({ seed = 0, random } = {}) {
         this.state = random === undefined

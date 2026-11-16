@@ -15,6 +15,40 @@ complètes disparaissent et le score évolue selon le nombre de lignes supprimé
 - Parties et décisions de l'IA Débutante reproductibles à partir d'une graine.
 - Interface responsive au style arcade néon.
 
+## Adversaires IA et simulations
+
+Les trois niveaux choisissent parmi les placements légaux :
+
+- **Débutant** choisit un placement au hasard; le choix est reproductible avec
+  la même graine.
+- **Intermédiaire** privilégie les lignes complétées et pénalise les trous et
+  les colonnes trop hautes.
+- **Expert** pondère la hauteur cumulée, les lignes supprimées, les trous et
+  l'irrégularité des colonnes. Il peut aussi anticiper la prochaine pièce.
+
+Les adversaires déplacent leur pièce progressivement. Leur délai est de 300 ms
+pour le niveau Débutant, 200 ms pour Intermédiaire et 100 ms pour Expert.
+
+Pour lancer les simulations sans interface graphique :
+
+```sh
+node scripts/simulate.js
+```
+
+Le script exécute 20 parties par niveau avec les mêmes graines (202 à 221) et
+affiche la moyenne des lignes supprimées. Chaque partie est limitée à 1 000
+pièces. Lors de la dernière exécution, les 20 parties expertes ont atteint
+cette limite; leur moyenne est donc tronquée et doit être interprétée avec
+prudence.
+
+## Mode multijoueur et podium
+
+Le mode multijoueur oppose le joueur humain à un, deux ou trois adversaires IA.
+Le dernier joueur encore en jeu gagne. À la fin, l'interface affiche le gagnant
+et le classement des trois premières places. Les joueurs éliminés sont classés
+dans l'ordre inverse de leur élimination. Si tous sont éliminés, la partie se
+termine sans gagnant. Le mode solo reste disponible sans podium.
+
 ## Technologies
 
 - JavaScript ES2022 avec modules ES.
@@ -74,7 +108,7 @@ npm run coverage
 - `src/core/` : logique du jeu sans accès au DOM ni au Canvas; contient le
   moteur, la grille, les pièces, le score, les parties, le gestionnaire et les IA.
 - `src/ui/` : rendu Canvas, commandes clavier et synchronisation des couleurs.
-- `tests/` : tests Vitest du moteur, de l'interface et des IA.
+- `tests/` : tests Vitest du moteur, des couleurs verrouillées, des parties et des IA.
 - `docs/` : spécification et documents du projet.
 - `index.html` : page du jeu.
 - `styles.css` : présentation visuelle.

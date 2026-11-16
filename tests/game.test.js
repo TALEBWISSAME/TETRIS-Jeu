@@ -176,7 +176,13 @@ describe("moteur de partie", () => {
             return sequence;
         };
 
-        expect(collectSequence(12345)).toEqual(collectSequence(12345));
+        const sequence12345 = [
+            "L", "T", "T", "S", "S", "J",
+            "J", "S", "S", "T", "T", "I",
+        ];
+
+        expect(collectSequence(12345)).toEqual(sequence12345);
+        expect(collectSequence(54321)).not.toEqual(sequence12345);
     });
 
     it("fait descendre la pièce accélérée d'une case et augmente la vitesse par niveau", () => {

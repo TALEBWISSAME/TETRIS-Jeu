@@ -77,7 +77,11 @@ describe("GameManager", () => {
                 difficulty,
             ]);
             expect(manager.opponents.every(player => typeof player.aiRandom === "function")).toBe(true);
+            expect(manager.opponents.every(player => player.aiPlayer.difficulty === difficulty)).toBe(true);
+            expect(manager.opponents.every(player => player.aiPlayer.moveIntervalMs
+                === ({ beginner: 300, intermediate: 200, expert: 100 })[difficulty])).toBe(true);
             expect(manager.humanPlayer.aiRandom).toBeNull();
+            expect(manager.humanPlayer.aiPlayer).toBeNull();
         },
     );
 
@@ -94,5 +98,81 @@ describe("GameManager", () => {
         expect(new Set(first.opponents.map(player => player.aiRandom)).size).toBe(2);
         expect(firstValues).toEqual(repeatedValues);
         expect(firstValues[0]).not.toBe(firstValues[1]);
+    });
+
+    it.each([0, 1, 2, 3])(
+        "classe en tête le dernier joueur encore en vie (joueur %i)",
+        winnerIndex => {
+            const manager = new GameManager({ opponents: 3, seed: 2026 });
+            const eliminatedIndexes = manager.players
+                .filter(player => player.index !== winnerIndex)
+                .map(player => player.index);
+
+            eliminatedIndexes.forEach((index, eliminationIndex) => {
+                manager.players[index].game.state.status = "gameover";
+                manager.updateResults();
+
+                expect(manager.isFinished).toBe(eliminationIndex === eliminatedIndexes.length - 1);
+            });
+
+            expect(manager.winner).toBe(manager.players[winnerIndex]);
+            const expectedRanking = [
+                manager.players[winnerIndex],
+                ...[...eliminatedIndexes].reverse().map(index => manager.players[index]),
+            ];
+            expect(manager.ranking).toEqual(expectedRanking);
+            expect(manager.podium).toEqual(expectedRanking.slice(0, 3));
+            expect(manager.podium).toHaveLength(3);
+        },
+    );
+
+    it("ne désigne pas de gagnant en mode solo et garde les résultats réinitialisés", () => {
+        const manager = new GameManager({ seed: 12 });
+        manager.humanPlayer.game.softDrop();
+        manager.humanPlayer.game.state.status = "gameover";
+
+        expect(manager.updateResults()).toEqual([]);
+        expect(manager.winner).toBeNull();
+        expect(manager.isFinished).toBe(false);
+
+        const restartedManager = new GameManager({ opponents: 2, seed: 13 });
+        expect(restartedManager.humanPlayer.game.status).toBe("playing");
+        expect(restartedManager.humanPlayer.game.score).toBe(0);
+        expect(restartedManager.humanPlayer.game.linesCleared).toBe(0);
+        expect(restartedManager.winner).toBeNull();
+        expect(restartedManager.ranking).toEqual([]);
+        expect(restartedManager.podium).toEqual([]);
+        expect(restartedManager.isFinished).toBe(false);
+    });
+
+    it("réserve les commandes IA aux adversaires de ce gestionnaire", () => {
+        const manager = new GameManager({ opponents: 1 });
+        const otherManager = new GameManager({ opponents: 1 });
+        const humanBefore = { ...manager.humanPlayer.game.currentPiece };
+        const turn = { piece: null, placement: null };
+
+        expect(() => manager.advanceOpponent(manager.humanPlayer, turn)).toThrow(TypeError);
+        expect(() => manager.advanceOpponent(otherManager.opponents[0], turn)).toThrow(TypeError);
+        expect(manager.humanPlayer.game.currentPiece).toEqual(humanBefore);
+        expect(turn).toEqual({ piece: null, placement: null });
+    });
+
+    it("actualise le podium et arrête les commandes IA une fois le gagnant désigné", () => {
+        const manager = new GameManager({ opponents: 3 });
+        manager.players[0].game.state.status = "gameover";
+        manager.players[1].game.state.status = "gameover";
+        manager.updateResults();
+        manager.players[2].game.state.status = "gameover";
+
+        manager.advanceOpponent(manager.players[2], { piece: null, placement: null });
+
+        expect(manager.isFinished).toBe(true);
+        expect(manager.winner).toBe(manager.players[3]);
+        expect(manager.podium.map(player => player.index)).toEqual([3, 2, 1]);
+        const winnerBefore = { ...manager.winner.game.currentPiece };
+        const turn = { piece: null, placement: null };
+        expect(manager.advanceOpponent(manager.winner, turn)).toBe(manager.winner.game.state);
+        expect(manager.winner.game.currentPiece).toEqual(winnerBefore);
+        expect(turn).toEqual({ piece: null, placement: null });
     });
 });

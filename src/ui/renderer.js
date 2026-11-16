@@ -42,23 +42,18 @@ function drawCell(context, x, y, size, color, glow = true) {
     context.restore();
 }
 
-function drawLineClear(context, rows, progress, width, height) {
+function drawLineClear(context, rows, rowIndexes, progress, width, height) {
     if (!rows?.length || progress >= 1) {
         return;
     }
 
     const cellHeight = height / GRID_HEIGHT;
     const cellWidth = width / GRID_WIDTH;
-    const clearedBandHeight = rows.length * cellHeight;
     const glow = Math.sin(progress * Math.PI);
     context.save();
-    // Le compactage laisse autant de nouvelles lignes vides en haut de la grille.
-    context.beginPath();
-    context.rect(0, 0, width, clearedBandHeight);
-    context.clip();
     context.globalAlpha = glow;
     for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-        const y = rowIndex * cellHeight - progress * clearedBandHeight;
+        const y = (rowIndexes[rowIndex] ?? rowIndex) * cellHeight;
         for (let x = 0; x < GRID_WIDTH; x++) {
             const color = CELL_COLORS[rows[rowIndex][x]];
             if (color) {
@@ -80,6 +75,7 @@ function drawBoard(context, game, width, height, lockedColors, lineClear) {
     drawLineClear(
         context,
         lineClear?.rows,
+        lineClear?.rowIndexes,
         lineClear?.progress ?? 1,
         width,
         height,
@@ -228,8 +224,10 @@ function createStatistic(container, label) {
  * @param {HTMLElement} options.levelElement Élément qui affiche le niveau.
  * @param {HTMLElement} options.linesElement Élément qui affiche les lignes supprimées.
  * @param {HTMLElement} options.gameOverElement Élément du message de fin de partie.
- * @returns {(game: object, options?: {lockedColors?: (string|null)[][], lineClear?: object}) => void}
+ * @returns {(game: object, options?: {lockedColors?: (string|null)[][], lineClear?: {rows?: (string|null)[][], rowIndexes?: number[], progress?: number}}) => void}
  * Fonction qui dessine l'état et les couleurs verrouillées facultatives.
+ * @throws {TypeError} Si un élément HTML obligatoire est absent.
+ * @throws {Error} Si le navigateur ne fournit pas de contexte Canvas 2D.
  */
 export function createRenderer({
     boardCanvas,
@@ -276,8 +274,10 @@ export function createRenderer({
  * Prépare le rendu d'une à quatre parties dans une grille de joueurs.
  * @param {object} options Options du rendu.
  * @param {HTMLElement} options.container Conteneur qui contient l'élément .multiplayer-grid.
- * @returns {{renderPlayers: (players: object[]) => void, showSolo: () => void}}
+ * @returns {{renderPlayers: (players: object[], result?: object) => void, showSolo: () => void}}
  * Méthodes pour afficher les parties ou masquer l'arène en mode solo.
+ * @throws {TypeError} Si le conteneur ou sa structure HTML est invalide.
+ * @throws {Error} Si le navigateur ne fournit pas de contexte Canvas 2D.
  */
 export function createMultiplayerRenderer({ container }) {
     requireElement(container, "container");
@@ -285,11 +285,15 @@ export function createMultiplayerRenderer({ container }) {
     if (!grid) {
         throw new Error("Le conteneur doit inclure un élément .multiplayer-grid.");
     }
+    const results = container.querySelector(".multiplayer-results");
+    if (!results) {
+        throw new Error("Le conteneur doit inclure un élément .multiplayer-results.");
+    }
 
     const arcade = container.closest(".arcade");
     const soloLayout = arcade?.querySelector(".game-layout");
     const cards = new Map();
-    function renderPlayers(players) {
+    function renderPlayers(players, result = null) {
         if (!Array.isArray(players) || players.length < 1 || players.length > 4) {
             throw new RangeError("L'affichage doit contenir entre 1 et 4 joueurs.");
         }
@@ -370,10 +374,43 @@ export function createMultiplayerRenderer({ container }) {
         while (grid.children.length > activeCards.length) {
             grid.lastElementChild.remove();
         }
+        renderTournamentResult(result);
+    }
+
+    function renderTournamentResult(result) {
+        results.replaceChildren();
+        results.hidden = !result?.isFinished;
+        if (!result?.isFinished) {
+            return;
+        }
+
+        const title = document.createElement("h3");
+        title.className = "multiplayer-results__title";
+        title.textContent = result.winner
+            ? `Gagnant : ${getPlayerLabel(result.winner)}`
+            : "Partie terminée sans survivant";
+        results.append(title);
+
+        const podium = document.createElement("ol");
+        podium.className = "multiplayer-results__podium";
+        for (const player of result.podium) {
+            const entry = document.createElement("li");
+            entry.textContent = getPlayerLabel(player);
+            podium.append(entry);
+        }
+        results.append(podium);
+    }
+
+    function getPlayerLabel(player) {
+        return player.role === "human"
+            ? "Joueur humain"
+            : `Adversaire ${player.index}`;
     }
 
     function showSolo() {
         container.hidden = true;
+        results.replaceChildren();
+        results.hidden = true;
         if (arcade) {
             arcade.classList.remove("arcade--multiplayer");
         }

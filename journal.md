@@ -1,372 +1,390 @@
-
 # Journal de travail — TP4 Tetris
+
+Ce journal résume les demandes faites à Copilot pour les six exercices. Les
+commits et les tags `ex1` à `ex6` permettent de retrouver les grandes étapes,
+mais ils ne donnent pas le nombre exact de prompts envoyés. Quand ce nombre
+n'est pas conservé, je donne seulement le minimum vérifiable.
 
 ## Exercice 1 — Prise en main de GitHub Copilot
 
+### 1. Ce que j'ai demandé à Copilot
 
-### Étape 1 — Complétion des sept tétrominos
-- Outil utilisé : Complétion automatique GitHub Copilot (Tab).
-- Demande effectuée : J'ai écrit le commentaire décrivant les sept tétrominos et commencé l'objet PIECES.
-- Résultat obtenu : Copilot a proposé les matrices des sept pièces I, O, T, S, Z, J et L.
-- Modifications acceptées ou corrigées : Les sept matrices sont correctes. Aucune correction de forme nécessaire.
-- Nombre d'itérations : À compléter selon le nombre réel de propositions acceptées ou corrigées.
+- Avec la complétion automatique, j'ai commencé l'objet `PIECES` et la
+  fonction `rotate`.
+- Avec `Ctrl+I`, j'ai demandé de lever une erreur si la matrice n'était pas
+  carrée.
+- Avec Ask, j'ai demandé une explication de l'orientation des matrices et une
+  vérification des sept pièces.
+- Avec le chat du terminal, j'ai demandé l'initialisation de npm et
+  l'installation de Vitest.
+- Avec Agent, j'ai demandé trois tests pour `rotate`, puis le renommage de
+  `rotate` en `tourner`.
 
+### 2. Ce que Copilot a produit
 
+Copilot a proposé les sept matrices de `I`, `O`, `T`, `S`, `Z`, `J` et `L`.
+Il a complété la rotation horaire et ajouté la vérification des dimensions.
+Il a créé les tests de rotation et proposé la commande d'installation de
+Vitest. L'Agent a aussi renommé `rotate` et ses références dans une
+proposition séparée.
 
-### Étape 2 — Fonction rotate
-- Outil utilisé : Complétion automatique GitHub Copilot (Tab).
-- Demande effectuée : J'ai écrit la documentation et la signature de rotate(matrix), puis laissé Copilot compléter la fonction.
-- Résultat obtenu : La fonction effectue correctement une rotation horaire. Le test sur [[1,2],[3,4]] renvoie [[3,1],[4,2]].
-- Modifications acceptées ou corrigées : Une erreur de syntaxe est apparue car le fichier n'était pas enregistré. Après Ctrl+S, le test a réussi.
-- Nombre d'itérations : 1 génération, puis 1 nouvelle exécution du test après enregistrement.
+### 3. Ce que j'ai gardé
 
+J'ai gardé les sept matrices, la rotation, la vérification de matrice carrée,
+les trois tests et la configuration npm/Vitest. Les matrices ont été vérifiées
+et étaient correctes.
 
-### Étape 3 — Modification avec Ctrl+I
-- Outil utilisé : Chat en ligne (Ctrl+I).
-- Demande effectuée : Lever une erreur si la matrice n'est pas carrée.
-- Résultat obtenu : Copilot a ajouté une vérification des dimensions avant la rotation.
-- Modifications acceptées ou corrigées : J'ai vérifié le diff et accepté la modification. Le test avec une matrice 2x3 affiche "La matrice doit être carrée."
-- Nombre d'itérations : 1.
+### 4. Ce que j'ai corrigé ou annulé
 
+Une première exécution a semblé produire une erreur de syntaxe parce que le
+fichier n'était pas enregistré. Après `Ctrl+S`, le test a réussi. J'ai ajouté
+manuellement `"type": "module"` et le script `"test": "vitest run"`.
+J'ai utilisé Restore checkpoint pour annuler le renommage en `tourner` et
+conserver le nom `rotate`.
 
-### Étape 4 — Analyse avec Ask et contexte
-- Outil utilisé : Chat Copilot avec contexte du fichier.
-- Demande effectuée : Expliquer l'orientation des matrices et identifier une éventuelle pièce incorrecte.
-- Résultat obtenu : Copilot a expliqué la signification des 0 et des 1, l'orientation initiale et le fonctionnement de rotate.
-- Modifications acceptées ou corrigées : Aucune modification du code. Après vérification, les sept matrices étaient correctes.
-- Observation : Copilot a consulté piece.js et journal.md pour répondre.
-- Nombre d'itérations : 1.
+### 5. Le nombre d'itérations
 
+Le détail vérifiable est le suivant :
 
+- étape 1 : Nombre exact non relevé ;
+- étape 2 : 1 génération, puis 1 nouvelle exécution après l'enregistrement ;
+- étape 3 : 1 demande ;
+- étape 4 : 1 demande ;
+- étape 5 : 1 demande ;
+- étape 6 : 1 demande Agent ;
+- étape 7 : 1 demande Agent, puis restauration du checkpoint.
 
-### Étape 5 — Initialisation npm et installation de Vitest
-- Outil utilisé : Chat en ligne dans le terminal (Ctrl+I).
-- Demande effectuée : Initialiser npm et installer Vitest comme dépendance de développement.
-- Résultat obtenu : Copilot a proposé une commande PowerShell qui a créé package.json et installé Vitest (35 packages, 0 vulnérabilité signalée).
-- Modifications acceptées ou corrigées : J'ai exécuté la commande proposée, puis ajouté manuellement "type": "module" et le script "test": "vitest run".
-- Nombre d'itérations : 1.
+Nombre exact non relevé pour l'ensemble des propositions de complétion.
 
+### 6. Mon bilan personnel
 
-### Étape 6 — Création des tests avec Agent
-- Outil utilisé : GitHub Copilot, mode Agent.
-- Demande effectuée : Créer trois tests Vitest pour rotate (2x2, 3x3 et matrice non carrée), puis lancer npm test.
-- Résultat obtenu : Copilot a créé tests/piece.test.js. Les trois tests ont réussi.
-- Modifications acceptées ou corrigées : J'ai relu les trois tests. Ils vérifient correctement les résultats attendus. Aucun autre fichier n'a été modifié.
-- Nombre d'itérations : 1.
+La complétion est pratique pour écrire rapidement du code connu, mais je dois
+enregistrer le fichier et tester le résultat. Le mode Agent peut modifier
+plusieurs fichiers, et le checkpoint permet de revenir en arrière.
 
+## Exercice 2 — Développement du jeu solo
 
-### Étape 7 — Renommage et restauration du checkpoint
-- Outil utilisé : GitHub Copilot, mode Agent et Restore checkpoint.
-- Demande effectuée : Renommer rotate en tourner dans tout le projet.
-- Résultat obtenu : Copilot a renommé la fonction et actualisé ses références. Les 3 tests ont réussi.
-- Modifications acceptées ou corrigées : J'ai utilisé Restore checkpoint pour annuler le renommage et retrouver la fonction rotate.
-- Nombre d'itérations : 1.
-- Observation : Le checkpoint permet d'annuler les changements d'une intervention de l'Agent sans recommencer tout le travail.
+### 1. Ce que j'ai demandé à Copilot
 
+J'ai d'abord demandé un plan de développement à Copilot en mode Plan/Ask.
+Après ce plan, j'ai demandé les cinq étapes du jeu :
 
-## Exercice 2 — Préparation du plan
+1. créer la grille et ses tests ;
+2. créer le score et les niveaux ;
+3. construire le moteur du jeu ;
+4. créer l'interface graphique ;
+5. relier le moteur, l'interface et les commandes.
 
-J'ai utilisé le mode Plan/Ask de GitHub Copilot pour préparer le développement du Tetris à partir de SPEC.md. La première proposition contenait des noms de fichiers différents de ceux demandés dans le TP et oubliait grid.js. J'ai donc demandé à Copilot de corriger son plan. La deuxième proposition respecte l'architecture et contient cinq étapes. Je l'ai validée et enregistrée dans docs/PLAN.md.
+J'ai aussi demandé des corrections pendant le développement, notamment pour
+les problèmes du moteur, les couleurs des pièces verrouillées, l'animation
+des lignes et les identifiants des boutons.
 
-Nombre d'itérations : 2 propositions.
+### 2. Ce que Copilot a produit
 
-### Exercice 2 — Étape 1 : Grille et pièces
+La première proposition de plan utilisait des noms de fichiers différents de
+ceux demandés et oubliait `grid.js`. Après correction, le plan contenait cinq
+étapes conformes à l'organisation du projet.
 
-J'ai utilisé le mode Agent de GitHub Copilot pour réaliser la première étape du plan. Je lui ai demandé de créer la grille du Tetris et ses tests, sans modifier les fichiers de l'exercice 1.
+L'Agent a ensuite produit :
 
-Copilot a créé src/core/grid.js et tests/grid.test.js. Il a ajouté les fonctions nécessaires pour créer la grille, vérifier les placements, verrouiller les pièces et supprimer les lignes complètes.
+- `grid.js` et ses tests ;
+- `scoring.js` et ses tests ;
+- `game.js` et les tests du moteur ;
+- `renderer.js`, `index.html` et `styles.css` ;
+- `main.js`, `input.js`, puis `locked-colors.js` et ses tests.
 
-L'Agent a exécuté npm test : les 8 tests sont passés dans 2 fichiers.
+Les résultats historiques consignés sont passés de 8 tests à 40, puis 44
+tests réussis. L'interface a été testée dans le navigateur pour les
+déplacements, la rotation, la suppression des lignes et le score.
 
-Nombre d'itérations : 1 demande, sans correction supplémentaire pour le moment.
+### 3. Ce que j'ai gardé
 
-### Exercice 2 — Étape 2 : Score et niveaux
+J'ai gardé l'organisation en `src/core` et `src/ui`, le style arcade néon,
+les cinq étapes du plan, les tests et les identifiants des boutons. J'ai
+également gardé les corrections qui ont permis au jeu solo d'être jouable.
 
-J'ai utilisé le mode Agent de GitHub Copilot pour réaliser la deuxième étape du plan. Je lui ai demandé de créer les fonctions de calcul du score et du niveau ainsi que leurs tests.
+### 4. Ce que j'ai corrigé ou annulé
 
-Copilot a créé src/core/scoring.js et tests/scoring.test.js. Le score dépend du nombre de lignes supprimées en une seule fois : 100, 300, 500 ou 800 points. Le niveau commence à 1 et augmente toutes les 10 lignes supprimées.
+J'ai demandé de corriger le premier plan pour qu'il corresponde aux fichiers
+du TP. Pendant l'étape du moteur, trois problèmes ont été signalés au premier
+lancement des tests ; les tests et les corrections ont été repris jusqu'à
+obtenir 40 tests réussis. Une erreur de modification CSS a aussi nécessité
+une nouvelle tentative. Enfin, les couleurs des pièces verrouillées et
+l'animation de suppression ont été reprises après plusieurs essais.
 
-J'ai vérifié le code et les cas de test proposés, notamment les valeurs invalides et les changements de niveau.
+### 5. Le nombre d'itérations
 
-Nombre d'itérations : 1 demande, sans correction supplémentaire.
+Le minimum vérifiable est de 7 demandes principales : 2 propositions de plan
+et 5 demandes correspondant aux étapes du développement. Il faut ajouter les
+demandes de correction du moteur, du CSS, des identifiants, des couleurs et
+de l'animation. Nombre exact non relevé ; les
+commits ne permettent pas de le déduire.
 
-### Exercice 2 — Étape 3 : Moteur du jeu
+### 6. Mon bilan personnel
 
-J'ai utilisé le mode Agent de GitHub Copilot pour développer le moteur du Tetris. Je lui ai demandé de gérer les déplacements, les rotations, les collisions, la descente des pièces, le score, les niveaux et la fin de partie.
+Le découpage en étapes m'a permis de tester chaque partie séparément. J'ai
+compris qu'un jeu peut fonctionner en apparence tout en ayant encore des
+problèmes de synchronisation entre le moteur et l'interface. Les tests et la
+vérification dans le navigateur sont donc complémentaires.
 
-Copilot a créé src/core/game.js et tests/game.test.js, en réutilisant les fichiers déjà développés.
+## Exercice 3 — Tests et couverture
 
-Lors du premier lancement des tests, trois problèmes ont été détectés dans les scénarios de test. Copilot a corrigé les tests et relancé plusieurs fois npm test avant d'obtenir un résultat correct.
+### 1. Ce que j'ai demandé à Copilot
 
-Au final, les 40 tests sont passés dans 4 fichiers. Aucun fichier existant n'a été modifié.
+J'ai demandé à Copilot en mode Ask d'analyser les tests existants et de
+signaler les cas manquants. Avec Agent, j'ai demandé cinq tests
+supplémentaires pour la grille. J'ai aussi utilisé la complétion pour écrire
+trois tests dans `piece.test.js`, puis demandé une correction après un échec.
+Enfin, j'ai demandé une correction à partir d'une erreur provoquée dans
+`scoring.js`.
 
-Nombre d'itérations : plusieurs corrections et relances des tests ont été nécessaires.
-### Exercice 2 — Étape 4 : Interface graphique
+### 2. Ce que Copilot a produit
 
-J'ai utilisé le mode Agent de GitHub Copilot pour créer l'interface graphique du Tetris. J'ai choisi un style arcade néon avec un fond sombre, des couleurs lumineuses et une interface responsive.
+Copilot a ajouté des tests pour les limites de la grille, plusieurs lignes,
+les orientations de `T`, les collisions et la couverture des cas limites.
+Le nombre de tests est passé de 44 à 49, puis à 52. La couverture des lignes
+de `src/core` a atteint 93,79 % au tag `ex3`.
 
-Copilot a créé trois fichiers : src/ui/renderer.js, index.html et styles.css.
+J'ai aussi provoqué une erreur en remplaçant temporairement 500 par 300
+points pour trois lignes. Le test a échoué et la valeur correcte a ensuite
+été remise dans `scoring.js`.
 
-Pendant le développement, Copilot a rencontré une erreur lors d'une modification du CSS. Il a relu le fichier et effectué une nouvelle modification.
+### 3. Ce que j'ai gardé
 
-Les 40 tests existants sont passés. Les boutons et les commandes ne sont pas encore fonctionnels, car ils seront reliés au moteur à l'étape 5.
+J'ai gardé les tests supplémentaires, la commande `npm run coverage` et la
+correction du score. Les tests ont de nouveau réussi après la correction.
 
-J'ai également remarqué que les pièces verrouillées ont toutes la même couleur. Ce point devra être corrigé pour respecter la spécification.
+### 4. Ce que j'ai corrigé ou annulé
 
-Nombre d'itérations : une correction du CSS après une erreur d'application.
-Après avoir vérifié les fichiers créés, j'ai demandé à Copilot d'ajouter des identifiants aux trois boutons pour faciliter leur utilisation à l'étape suivante. Copilot a modifié uniquement `index.html`, sans brancher les boutons.
+Une proposition de test utilisait une grille de mauvaise taille et attendait
+une exception alors que le comportement attendu était `false`. Je l'ai
+corrigée pour vérifier le bon résultat. Pour le bug du score, la correction a
+été faite dans le code et non dans le test.
 
-J'ai conservé cette modification. Les 40 tests annoncés précédemment étaient réussis. Je testerai l'interface complète lorsque le jeu sera fonctionnel.
+Les informations conservées ne prouvent pas qu'un test était une tautologie
+ou inutile au sens exact de la question. Je ne présente donc pas un test
+comme inutile sans cette preuve.
 
-### Exercice 2 — Étape 5 : Jeu fonctionnel
+### 5. Le nombre d'itérations
 
-J'ai utilisé GitHub Copilot en mode Agent pour rendre mon Tetris jouable. Copilot a créé `main.js` et `src/ui/input.js` pour relier le moteur à l'interface.
+Le minimum vérifiable est de 4 demandes liées à Copilot : analyse Ask,
+création des tests de grille, complétion des tests de pièces et correction du
+score. Une demande de correction du test de collision est également
+documentée. Nombre exact non relevé.
 
-J'ai ensuite demandé une correction pour mieux gérer les couleurs des pièces verrouillées et l'animation de suppression des lignes. Copilot a ajouté `src/ui/locked-colors.js` et des tests. Plusieurs essais ont été nécessaires avant que tous les tests passent.
+### 6. Mon bilan personnel
 
-Résultat : 44 tests réussis. J'ai également testé le jeu dans mon navigateur. Les déplacements, la rotation et la suppression des lignes fonctionnent, et le score augmente.
+Un nombre élevé de tests ne garantit pas leur qualité. Il faut vérifier que
+chaque assertion teste réellement le comportement demandé et utiliser la
+couverture pour repérer les chemins oubliés. Une erreur volontaire dans le
+code est aussi un bon moyen de vérifier qu'un test peut détecter le problème.
 
-J'ai conservé les modifications après ces vérifications.
+## Exercice 4 — Mode versus
 
-### Exercice 3 — Complément des tests
+### 1. Ce que j'ai demandé à Copilot
 
-J'ai d'abord utilisé Copilot en mode Ask pour analyser les tests existants. Il a repéré des cas manquants, notamment pour les limites de la grille et la suppression de plusieurs lignes.
+J'ai demandé un plan pour ajouter le mode multijoueur, puis les cinq étapes
+suivantes :
 
-J'ai ensuite utilisé le mode Agent pour compléter les tests. Copilot a ajouté cinq tests dans `grid.test.js`, sans modifier le moteur. Les 49 tests passent.
+1. créer `GameInstance` ;
+2. créer `GameManager` ;
+3. afficher plusieurs parties ;
+4. connecter le fonctionnement multijoueur ;
+5. valider les modes solo et multijoueur.
 
-### Exercice 3 — Tests et couverture
+### 2. Ce que Copilot a produit
 
-J'ai commencé par utiliser Copilot en mode Ask pour vérifier les tests déjà présents et repérer ceux qui manquaient.
+Copilot a créé `GameInstance` et `GameManager`, leurs tests, l'affichage de
+une à quatre grilles, le choix du mode et la connexion des commandes. Il a
+ajouté l'affichage des scores, niveaux et états de chaque partie.
 
-Ensuite, avec le mode Agent, j'ai complété les tests de la grille. Copilot a ajouté 5 tests et nous sommes passés de 44 à 49 tests réussis.
+Les résultats historiques sont passés de 58 tests à 71 tests réussis. La
+validation finale indiquait 91,74 % de couverture des instructions.
 
-J'ai ensuite utilisé la complétion automatique de Copilot dans `piece.test.js` pour écrire trois tests : les quatre orientations de T, une collision contre le bord droit et une collision avec une case déjà occupée. J'ai dû corriger une proposition de Copilot qui utilisait une grille de mauvaise taille et attendait une exception au lieu de `false`.
+### 3. Ce que j'ai gardé
 
-Après ces modifications, les 52 tests passaient.
+J'ai gardé les instances de jeu indépendantes, le mode solo, les modes avec
+un à trois adversaires, les quatre grilles et le style multijoueur.
 
-J'ai installé `@vitest/coverage-v8` et ajouté la commande `npm run coverage`. J'ai obtenu 93,79 % de couverture des lignes pour `src/core`, ce qui dépasse les 80 % demandés.
+### 4. Ce que j'ai corrigé ou annulé
 
-Enfin, j'ai volontairement modifié `scoring.js` pour donner 300 points au lieu de 500 lorsque trois lignes sont supprimées. Un test a échoué. J'ai demandé à Copilot Agent de corriger le code à partir de l'erreur du terminal. Il a remis la bonne valeur dans `scoring.js` sans modifier les tests.
+En mode multijoueur, les boutons étaient masqués. Copilot a corrigé
+l'affichage. Je n'ai pas de preuve d'un test échoué pendant le refactoring :
+le problème documenté concernait l'interface, pas une assertion de test.
 
-Après la correction, les 52 tests ont de nouveau réussi.
+### 5. Le nombre d'itérations
 
-### Exercice 4 — Étape 1 : GameInstance
+Le minimum vérifiable est de 6 demandes : 1 demande de plan et 5 demandes
+Agent correspondant aux étapes. La correction de l'affichage et les
+éventuelles relances sont documentées.
+Nombre exact non relevé.
 
-J'ai commencé par demander à Copilot en mode Ask de proposer un plan pour le mode multijoueur. Il a proposé cinq étapes, que j'ai validées.
+### 6. Mon bilan personnel
 
-Ensuite, j'ai utilisé Copilot Agent pour créer `game-instance.js` et `game-instance.test.js`.
+Le refactoring a permis de séparer une partie de l'état du jeu et de gérer
+plusieurs parties sans réécrire les règles du moteur. J'ai aussi compris
+qu'un changement d'interface doit être vérifié séparément des tests du cœur.
 
-Copilot a réutilisé le moteur existant pour représenter une partie indépendante, avec son propre état et son générateur aléatoire.
+## Exercice 5 — Joueurs IA
 
-Il a ajouté 6 tests pour vérifier l'indépendance des parties et la compatibilité avec le mode solo.
+### 1. Ce que j'ai demandé à Copilot
 
-Résultat : 58 tests réussis sur 58. Aucun autre fichier n'a été modifié.
+J'ai demandé les sept étapes de l'IA :
 
-### Exercice 4 — Étape 2 : GameManager
+1. énumérer les placements légaux ;
+2. créer l'IA débutante ;
+3. créer l'IA intermédiaire ;
+4. créer l'IA experte ;
+5. intégrer les trois niveaux au mode multijoueur ;
+6. comparer les niveaux par simulation ;
+7. valider l'ensemble.
 
-J'ai utilisé Copilot Agent pour créer `game-manager.js` et `game-manager.test.js`.
+J'ai aussi demandé une expérience séparée pour comparer l'effet des
+pondérations de l'IA experte avec les mêmes graines.
 
-Le gestionnaire permet de créer une partie solo ou avec 1 à 3 adversaires. Chaque partie possède son propre état et sa propre graine aléatoire.
+### 2. Ce que Copilot a produit
 
-Copilot a ajouté 13 tests pour vérifier les différentes configurations, l'indépendance des parties et la reproductibilité.
+Copilot a créé `ai.js`, les stratégies débutante, intermédiaire et experte,
+la classe `AIPlayer`, les tests d'intégration et le test de simulation.
+Les tests sont passés historiquement de 77 à 83, 91, 99, 111 puis 112.
 
-Résultat : 71 tests réussis sur 71. Aucun fichier existant n'a été modifié et aucune IA n'a été ajoutée.
-### Exercice 4 — Étape 3 : Interface multijoueur
+Dans la simulation documentée, l'IA experte a obtenu de meilleurs résultats
+que l'IA débutante dans le scénario testé. L'expérience sur les pondérations
+a donné les résultats suivants : les trous ont eu le plus d'effet, avec une
+moyenne passant de 44,33 à 96,33 lignes ; les résultats restent limités à
+trois simulations par variante.
 
-J'ai utilisé Copilot Agent pour préparer l'affichage de plusieurs parties de Tetris.
+### 3. Ce que j'ai gardé
 
-Copilot a modifié `renderer.js`, `index.html` et `styles.css`. Il a ajouté une fonction pour afficher de 1 à 4 grilles, avec une disposition 2 × 2 et un style arcade néon.
+J'ai gardé les trois niveaux, les placements légaux, la classe `AIPlayer`,
+les décisions reproductibles et l'intégration au mode multijoueur. J'ai
+également gardé les déplacements progressifs : 300 ms pour Débutant, 200 ms
+pour Intermédiaire et 100 ms pour Expert.
 
-Chaque partie peut afficher son score, son niveau et son état. Le joueur humain est distingué des adversaires.
+### 4. Ce que j'ai corrigé ou annulé
 
-Le mode multijoueur n'est pas encore connecté à `main.js`. Cette partie sera réalisée à l'étape suivante.
+Une valeur `-0` a été corrigée dans un test. Une valeur attendue pour
+l'irrégularité de l'IA experte a aussi été corrigée. Le délai de simulation a
+été augmenté à 60 secondes pour éviter un dépassement pendant la couverture,
+sans changer le scénario ni les résultats attendus.
 
-Résultat : 71 tests réussis sur 71. Le moteur du jeu n'a pas été modifié.
+Les simulations utilisent un scénario précis et ne permettent pas de
+conclure que l'Expert est toujours meilleur. Les résultats rapportés dans les
+documents doivent donc être lus avec cette limite.
 
-### Exercice 4 — Étape 4 : fonctionnement du multijoueur
+### 5. Le nombre d'itérations
 
-J'ai utilisé Copilot Agent pour connecter le mode multijoueur au jeu.
+Le minimum vérifiable est de 7 demandes Agent, une pour chaque étape.
+L'expérience sur les pondérations et les corrections de tests constituent
+des demandes supplémentaires. Nombre exact non relevé.
 
-Copilot a modifié `main.js`, `renderer.js`, `index.html` et `styles.css`. Il a ajouté un choix entre le mode solo et 1 à 3 adversaires.
+### 6. Mon bilan personnel
 
-Pendant les vérifications, Copilot a rencontré un problème avec les boutons qui étaient masqués en mode multijoueur. Il a corrigé ce problème.
+J'ai compris qu'une IA ne doit pas tricher en posant directement une pièce
+dans la grille. Elle doit utiliser les mêmes règles et les mêmes fonctions
+que le joueur. Les simulations sont utiles pour comparer les stratégies,
+mais quelques graines ne suffisent pas pour tirer une conclusion générale.
 
-J'ai ensuite testé le jeu dans mon navigateur avec trois adversaires. Les quatre grilles s'affichent, les pièces descendent et les flèches contrôlent uniquement mon joueur. J'ai aussi vérifié que les boutons Pause et Reprendre fonctionnent.
+## Exercice 6 — Documentation et revue de code
 
-Résultat : 71 tests réussis sur 71. Aucune intelligence artificielle n'a encore été ajoutée.
+### 1. Ce que j'ai demandé à Copilot
 
-### Exercice 4 — Étape 5 : Validation finale
+J'ai demandé à Copilot :
 
-J'ai demandé à Copilot Agent de vérifier le fonctionnement complet du mode multijoueur.
+- d'ajouter les JSDoc des fonctions importantes ;
+- de créer le `README.md` ;
+- de documenter l'architecture avec deux diagrammes Mermaid ;
+- de faire une revue du moteur, de l'interface, des tests et de la
+  documentation ;
+- de corriger la vitesse des adversaires IA ;
+- de corriger la validation de la matrice dans `GameInstance.playPlacement()`.
 
-Il a testé les modes solo et multijoueur avec 1 à 3 adversaires. Il a aussi vérifié les commandes du joueur humain, la descente automatique des pièces, la pause, la reprise, le redémarrage et le changement de mode.
+### 2. Ce que Copilot a produit
 
-Copilot a également vérifié les couleurs des pièces verrouillées et l'animation de suppression des lignes.
+Copilot a ajouté les JSDoc, le README et `docs/ARCHITECTURE.md`. La revue a
+signalé trois points : les adversaires plaçaient trop vite leurs pièces, la
+validation de `playPlacement()` était insuffisante et l'animation des lignes
+méritait une vérification.
 
-Résultat : 71 tests réussis sur 71 et 91,74 % de couverture des instructions.
+Pour les deux premiers points, Copilot a ajouté `opponent-turn.js`, rendu les
+déplacements progressifs et renforcé la validation de `playPlacement()`. Les
+tests sont passés à 116 puis 118. Des compléments ultérieurs ont ajouté le
+podium et les tests correspondants ; une validation a alors atteint 123,
+puis 130 tests.
 
-Aucun bug n'a été détecté pendant cette validation. Aucun fichier n'a été modifié et aucun test supplémentaire n'a été nécessaire.
+### 3. Ce que j'ai gardé
 
-### Exercice 5 — Étape 1 : Placements possibles
+J'ai gardé les JSDoc, le README, l'architecture, les trois niveaux d'IA, les
+déplacements progressifs, le podium et les tests de validation. Les
+dépendances du diagramme ont été vérifiées avec les imports actuels.
 
-J'ai utilisé Copilot Agent pour créer `ai.js` et `ai.test.js`.
+### 4. Ce que j'ai corrigé ou annulé
 
-Copilot a ajouté une fonction `findLegalPlacements` qui cherche les placements possibles d'une pièce. Elle vérifie les rotations, les positions horizontales et les collisions, puis simule la descente sans modifier la grille.
+Les corrections des deux problèmes majeurs de la revue sont attribuées à
+Copilot dans le journal et l'historique. La remarque sur l'animation n'était
+pas confirmée par un test de rendu ou une vérification visuelle dans les
+éléments historiques ; je ne la qualifie donc pas de fausse.
 
-Lors de la première exécution, un test a échoué à cause d'une valeur `-0`. Copilot a corrigé ce problème et relancé les tests.
+Après le tag `ex6`, des corrections techniques ont été réalisées avec Codex,
+et non ajoutées rétroactivement au travail initial de Copilot. Elles
+concernent notamment la conservation de la position réelle des lignes
+supprimées pendant l'animation, un test de redémarrage après une partie
+commencée et des compléments JSDoc. La difficulté affichée sous le pseudo
+était déjà présente. Ces corrections ultérieures ont été validées par 141
+tests ; la couverture a réussi avec un délai adapté à la simulation IA.
 
-Résultat : 77 tests réussis sur 77, dont 6 nouveaux tests. Aucun autre fichier n'a été modifié.
+### 5. Le nombre d'itérations
 
-### Exercice 5 — Étape 2 : IA débutante
+Le minimum vérifiable est de 7 demandes : deux demandes pour les JSDoc, puis
+une pour le README, une pour l'architecture, une pour la revue et deux pour
+les corrections majeures. La finalisation documentaire et les corrections
+ultérieures ajoutent des interventions, mais leur nombre exact n'est pas
+Nombre exact non relevé.
 
-J'ai demandé à Copilot Agent de créer une IA débutante qui choisit un placement au hasard parmi les placements possibles.
+### 6. Mon bilan personnel
 
-Copilot a ajouté la fonction `chooseBeginnerPlacement` dans `ai.js`. Elle utilise la fonction créée à l'étape précédente et un générateur aléatoire pour choisir un placement valide.
+La documentation doit rester liée au code réel. Une revue de code donne des
+pistes, mais il faut les confirmer avec le code et les tests avant d'affirmer
+qu'un problème existe. J'ai aussi appris à distinguer le travail produit
+pendant les exercices avec Copilot des corrections techniques faites ensuite
+avec Codex.
 
-Il a aussi ajouté 6 tests pour vérifier les placements, les tirages reproductibles, les cas où aucun placement n'est possible et l'absence de modification de la grille.
+## Corrections réalisées après les exercices
 
-Résultat : 83 tests réussis sur 83. Aucun autre fichier n'a été modifié.
+Cette partie distingue les corrections réalisées après les tags des résultats
+historiques des exercices.
 
-### Exercice 5 — Étape 3 : IA intermédiaire
+### Travail initial réalisé avec Copilot
 
-J'ai demandé à Copilot Agent de créer une IA intermédiaire qui choisit un placement en fonction de la grille.
+Dans l'exercice 6, Copilot a corrigé le fonctionnement des IA : leurs
+placements restent légaux et leurs pièces avancent progressivement avec les
+fonctions du moteur, au lieu d'être posées directement au bas de la grille.
+Les tests ont confirmé ces déplacements et le verrouillage des pièces.
 
-Copilot a ajouté `chooseIntermediatePlacement` dans `ai.js`. Cette fonction simule les placements possibles, favorise les lignes complétées et pénalise les trous ainsi que les hauteurs trop importantes.
+### Corrections ultérieures réalisées avec Codex
 
-En cas d'égalité, l'IA garde le premier placement trouvé. Copilot a aussi ajusté un scénario de test pour mieux vérifier la pénalité des trous.
+Après le tag `ex6`, Codex a renforcé le test de reproductibilité des pièces.
+Le test vérifie maintenant la séquence attendue pour la graine `12345` et la
+différence avec `54321`. Une mutation temporaire qui ignore la graine et
+retourne toujours `0` a montré que l'ancien test pouvait réussir alors que le
+test renforcé échoue.
 
-Résultat : 91 tests réussis sur 91. Les données de la partie ne sont pas modifiées et aucun autre fichier n'a été changé.
+Codex a aussi réalisé des corrections documentaires et techniques, notamment
+la vérification de la position réelle des lignes pendant l'animation, un test
+de redémarrage après une partie commencée et des compléments JSDoc. La
+difficulté de chaque IA sous son pseudo était déjà présente et n'a pas
+nécessité de correction.
 
-### Exercice 5 — Étape 4 : IA experte
+La suite actuelle a ensuite été validée avec 141 tests réussis. La couverture
+a également réussi avec un délai adapté à la simulation IA. Ces vérifications
+récentes ne remplacent pas les résultats historiques indiqués dans les six
+exercices.
 
-J'ai demandé à Copilot Agent de développer une IA experte qui évalue les placements avec une formule prenant en compte la hauteur cumulée, les lignes supprimées, les trous et l'irrégularité des colonnes.
+## Bilan général
 
-Copilot a ajouté la fonction `chooseExpertPlacement` dans `ai.js`. Elle peut aussi anticiper le prochain coup lorsque la prochaine pièce est connue.
-
-Pendant les tests, Copilot a trouvé une erreur dans la valeur attendue pour l'irrégularité d'une grille. Il a corrigé cette valeur et relancé les tests.
-
-Résultat : 99 tests réussis sur 99. Seuls `ai.js` et `ai.test.js` ont été modifiés.
-
-### Exercice 5 — Étape 5 : Intégration des IA
-
-J'ai demandé à Copilot Agent d'intégrer les trois niveaux d'IA dans le mode multijoueur.
-
-Copilot a modifié le gestionnaire des parties, les instances de jeu et l'interface pour permettre de choisir la difficulté des adversaires.
-
-J'ai testé le jeu dans mon navigateur avec trois adversaires en mode Intermédiaire puis Expert. Les adversaires placent leurs pièces automatiquement et peuvent supprimer des lignes.
-
-J'ai remarqué des blocs colorés en haut de certaines grilles. J'ai demandé à Copilot de vérifier ce comportement. Il a confirmé qu'il s'agissait des nouvelles pièces actives qui apparaissent après chaque placement, et non d'un bug.
-
-Résultat : 111 tests réussis sur 111. Aucune correction supplémentaire n'a été nécessaire.
-
-### Exercice 5 — Étape 6 : Comparaison des IA
-
-J'ai demandé à Copilot Agent de comparer les performances des trois IA avec des simulations.
-
-Il a créé `ai-simulation.test.js` pour faire jouer les IA sur trois graines fixes, avec la même suite de pièces pour chaque niveau.
-
-Les résultats moyens sont :
-- IA débutante : 33 points, 0,33 ligne et 19 pièces placées.
-- IA intermédiaire : 1 333 points, 10,33 lignes et 55 pièces placées.
-- IA experte : 5 033 points, 44,33 lignes et 142 pièces placées.
-
-L'IA experte a donc obtenu de meilleurs résultats que la débutante dans ces simulations.
-
-Copilot a utilisé une distribution avec 70 % de pièces S/Z pour obtenir des parties complètes assez rapidement. Les résultats concernent donc ce scénario précis.
-
-Résultat : 112 tests réussis sur 112. Aucun fichier existant n'a été modifié.
-
-### Exercice 5 — Étape 7 : Validation finale
-
-J'ai demandé à Copilot Agent de vérifier l'ensemble de l'exercice 5.
-
-Il a lancé les tests, calculé la couverture et vérifié la syntaxe des fichiers JavaScript.
-
-Au début, le test de simulation dépassait le délai de 5 secondes pendant le calcul de couverture. Copilot a augmenté le délai autorisé pour ce test à 60 secondes, sans modifier les scénarios ni les résultats attendus.
-
-Après cette correction, tous les tests passent.
-
-Résultat : 112 tests réussis sur 112 et 94,97 % de couverture des instructions.
-
-Les trois niveaux d'IA sont fonctionnels. Les simulations montrent que l'IA experte obtient de meilleurs résultats que l'IA débutante sur les graines testées.
-### Exercice 6 — Étape 1 : Documentation JSDoc
-
-J'ai utilisé Copilot Agent pour ajouter des commentaires JSDoc aux fonctions importantes de mon projet Tetris.
-
-J'ai d'abord demandé à Copilot d'identifier les fonctions publiques à documenter. Il a proposé un plan concernant les fichiers du moteur, de la grille, des pièces, du score, des IA et de l'interface.
-
-J'ai ensuite accepté l'ajout des commentaires JSDoc en français pour expliquer le rôle des fonctions, leurs paramètres et leurs valeurs de retour.
-
-Copilot a modifié 10 fichiers JavaScript, sans changer le fonctionnement du jeu.
-
-J'ai vérifié le résultat avec les tests et les contrôles de syntaxe.
-
-Résultat : 112 tests réussis sur 112. Seuls les commentaires ont été modifiés.
-
-### Exercice 6 — Étape 2 : Création du README
-
-J'ai demandé à Copilot Agent de créer un fichier README.md pour présenter mon projet Tetris.
-
-Copilot a d'abord consulté les fichiers du projet pour vérifier les fonctionnalités et les commandes disponibles.
-
-Il a ensuite créé le README avec une présentation du jeu, les fonctionnalités, les technologies utilisées, les instructions d'installation, les commandes de lancement, les tests et les contrôles clavier.
-
-Comme le projet ne possède pas de script npm pour démarrer un serveur, Copilot a indiqué la commande Python utilisée pour lancer le jeu en local.
-
-J'ai accepté cette proposition, car elle correspond au fonctionnement actuel du projet.
-
-Résultat : le fichier README.md a été créé sans modifier le code JavaScript ni les tests.
-
-### Exercice 6 — Étape 3 : Documentation de l'architecture
-
-J'ai demandé à Copilot Agent de créer un document pour expliquer l'architecture de mon projet Tetris.
-
-Copilot a d'abord analysé les fichiers du moteur, de l'interface et du mode multijoueur.
-
-Il a ensuite créé le fichier `docs/ARCHITECTURE.md` avec une présentation des modules et une explication du fonctionnement du jeu.
-
-Le document contient aussi deux diagrammes Mermaid : un pour montrer les relations entre les modules et un autre pour représenter les étapes d'un tour de jeu.
-
-Copilot a vérifié la structure des diagrammes et les modifications Git.
-
-Résultat : le document d'architecture a été créé sans modifier le code du jeu.
-### Exercice 6 — Étape 4 : Revue du code
-
-J'ai utilisé Copilot en mode Ask pour analyser le code de mon Tetris sans le modifier.
-
-Copilot a vérifié le moteur, l'interface, les tests et la documentation.
-
-Il a identifié deux problèmes majeurs :
-- Les adversaires IA placent leurs pièces beaucoup plus vite que le joueur humain.
-- La méthode `playPlacement` ne vérifie pas suffisamment que la forme reçue correspond à la pièce active.
-
-Il a aussi signalé un problème mineur dans l'animation des lignes supprimées.
-
-J'ai décidé de traiter les deux problèmes majeurs en priorité, comme demandé dans le TP.
-### Exercice 6 — Étape 5 : Correction de la vitesse des IA
-
-Après la revue de code, j'ai demandé à Copilot Agent de corriger le premier problème majeur concernant la vitesse des adversaires.
-
-Avant la correction, les IA plaçaient immédiatement leurs pièces en bas de la grille, alors que le joueur humain devait attendre leur descente.
-
-Copilot a ajouté un contrôleur de tour IA dans `opponent-turn.js` et modifié `main.js`.
-
-Maintenant, les IA choisissent leur placement, puis leurs pièces descendent progressivement. Le moteur continue de gérer les collisions, le verrouillage et le score.
-
-Copilot a aussi ajouté des tests pour vérifier les trois niveaux d'IA et la descente des pièces.
-
-Résultat : 116 tests réussis sur 116.
-
-### Exercice 6 — Étape 6 : Correction de la validation des pièces
-
-J'ai demandé à Copilot Agent de corriger le deuxième problème majeur trouvé pendant la revue de code.
-
-Le problème venait de `GameInstance.playPlacement()`, qui pouvait accepter une matrice différente de la pièce active.
-
-Copilot a d'abord reproduit le problème avec une pièce T remplacée par une matrice `[[1]]`.
-
-Il a ensuite ajouté une vérification pour comparer la matrice proposée aux rotations possibles de la pièce active.
-
-Deux tests ont été ajoutés pour vérifier qu'une matrice incorrecte est refusée et qu'une rotation autorisée fonctionne toujours.
-
-Résultat : 118 tests réussis sur 118. Le score, les collisions et les autres règles du moteur n'ont pas été modifiés.
+Les tags `ex1` à `ex6` donnent les jalons du projet, mais ils ne constituent
+pas un compteur exact des prompts. Le journal permet de retrouver les
+demandes principales, les corrections conservées ou annulées et les résultats
+de tests. Pour les compléments réalisés après `ex6`, je distingue les
+corrections de Codex des productions historiques de Copilot au lieu de les
+confondre.

@@ -20,6 +20,7 @@ function requireButton(button, name) {
  * @param {() => void} options.onSoftDrop Action appelée pour accélérer la descente.
  * @param {EventTarget} [options.target=window] Cible qui reçoit les événements clavier.
  * @returns {() => void} Fonction qui retire les écouteurs installés.
+ * @throws {TypeError} Si un bouton obligatoire est absent.
  */
 export function bindInput({
     startButton,

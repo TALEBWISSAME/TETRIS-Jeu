@@ -48,6 +48,7 @@ describe("synchronisation des couleurs verrouillées", () => {
         expect(clearedRows).toBe(1);
         expect(result.removedRows).toHaveLength(1);
         expect(result.removedRows[0]).toEqual(["J", "J", "J", "J", "T", "T", "J", "J", "J", "J"]);
+        expect(result.removedRowIndexes).toEqual([GRID_HEIGHT - 1]);
         expect(result.lockedColors[0]).toEqual(Array(GRID_WIDTH).fill(null));
         expect(result.lockedColors[GRID_HEIGHT - 1][5]).toBe("T");
         expect(result.lockedColors[GRID_HEIGHT - 1][9]).toBeNull();
@@ -72,6 +73,7 @@ describe("synchronisation des couleurs verrouillées", () => {
         const result = applyLockedPiece(grid, colors, piece, nextGrid);
 
         expect(result.removedRows).toHaveLength(2);
+        expect(result.removedRowIndexes).toEqual([GRID_HEIGHT - 2, GRID_HEIGHT - 1]);
         expect(result.removedRows[0].every(color => color === "L" || color === "O")).toBe(true);
         expect(result.removedRows[1].every(color => color === "S" || color === "O")).toBe(true);
         expect(result.lockedColors.slice(0, 2)).toEqual([

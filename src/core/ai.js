@@ -12,6 +12,13 @@ const HOLE_PENALTY = 50;
 const HEIGHT_PENALTY = 1;
 const MAX_HEIGHT_PENALTY = 2;
 
+/** Délai entre deux déplacements d'une case, en millisecondes. */
+export const AI_MOVE_INTERVALS_MS = {
+    beginner: 300,
+    intermediate: 200,
+    expert: 100,
+};
+
 function simulatePlacement(grid, placement) {
     const placedGrid = placePiece(grid, placement.matrix, placement.x, placement.y);
     return clearFullRows(placedGrid);
@@ -219,4 +226,50 @@ export function chooseExpertPlacement(grid, piece, nextPiece) {
     }
 
     return bestPlacement;
+}
+
+/**
+ * Prend une décision de placement avec l'une des trois stratégies disponibles.
+ */
+export class AIPlayer {
+    /**
+     * Initialise une IA avec son niveau et son générateur aléatoire.
+     * @param {object} options Niveau de l'IA et générateur facultatif.
+     * @param {"beginner"|"intermediate"|"expert"} options.difficulty Niveau de stratégie.
+     * @param {() => number} [options.random=Math.random] Générateur utilisé par le niveau débutant.
+     * @throws {RangeError} Si le niveau n'est pas reconnu.
+     * @throws {TypeError} Si le générateur n'est pas une fonction.
+     */
+    constructor({ difficulty, random = Math.random } = {}) {
+        if (!Object.hasOwn(AI_MOVE_INTERVALS_MS, difficulty)) {
+            throw new RangeError("Le niveau doit être beginner, intermediate ou expert.");
+        }
+        if (typeof random !== "function") {
+            throw new TypeError("Le générateur aléatoire doit être une fonction.");
+        }
+
+        this.difficulty = difficulty;
+        this.random = random;
+        this.moveIntervalMs = AI_MOVE_INTERVALS_MS[difficulty];
+    }
+
+    /**
+     * Choisit une rotation et une colonne d'origine légales pour la pièce.
+     * L'analyse utilise des copies de la grille; la partie n'est pas modifiée.
+     * @param {number[][]} grid Grille actuelle.
+     * @param {number[][]} piece Matrice de la pièce active.
+     * @param {number[][]} [next] Matrice de la prochaine pièce, utilisée par l'expert.
+     * @returns {{rotation: number, colonne: number}|null} Décision, ou null si aucun placement n'est légal.
+     */
+    decide(grid, piece, next) {
+        const placement = this.difficulty === "beginner"
+            ? chooseBeginnerPlacement(grid, piece, this.random)
+            : this.difficulty === "intermediate"
+                ? chooseIntermediatePlacement(grid, piece)
+                : chooseExpertPlacement(grid, piece, next);
+
+        return placement
+            ? { rotation: placement.rotation, colonne: placement.x }
+            : null;
+    }
 }
